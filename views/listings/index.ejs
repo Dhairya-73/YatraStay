@@ -1,0 +1,24 @@
+<!-- <% layout("./layouts/Boilerplate.ejs") %>  this will get Boilerplate code which hase common code  which shows on every page
+ -->
+    <h3>All listings</h3>
+
+    <!-- <form method="GET" action="/listings/new">
+        <button type="submit">Create     new listing</button>
+    </form> -->
+
+    <div class="row row-cols-lg-3 rows-cols-md-2 rows-cols-sm-1">
+        <%  for(let listing of allListings){ %>
+            <a href="/listings/<%= listing._id %>" class="listing-link">
+                <div class="card col" style="width: 20rem;">
+  <img src="<%= listing.image %>" class="card-img-top" alt="...">
+  <div class="card-body">
+    <p class="card-text">
+        <b><%= listing.title%></b><br>
+        <%= listing.price.toLocaleString("en-IN")%>/ night
+    </p>
+  </div>
+</div>
+            </a>
+    <% } %>
+
+    </div>

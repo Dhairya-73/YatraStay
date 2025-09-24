@@ -1,0 +1,45 @@
+<% layout("./layouts/Boilerplate.ejs") %>
+    <div class="row">
+        <div class="col-8 offset-2">
+            <h1>Edit List</h1><br>
+            <form method="POST" action="/listings/<%= listing._id %>?_method=PUT"  class="needs-validation" novalidate>
+                <div class="mb-3">
+             <label for="title">Title</label>
+        <input name="listing[title]" class="form-control" value="<%= listing.title %>" type="text" id="title" required>
+        <div class="invalid-feedback">Title can't be empty</div>
+    </div>
+        <div class="mb-3">
+             <label for="desc">Description</label>
+        <textarea name="listing[description]" class="form-control"  id="desc" required><%= listing.description %></textarea>
+        <div class="invalid-feedback">Provide short description</div>
+    </div>
+        <div class="mb-3">
+            <label for="image">Image</label>
+         <input name="listing[image]" class="form-control" value="<%= listing.image%>" type="text" id="image" required>
+                <div class="invalid-feedback">Provide image link</div>
+        </div>
+        <div class="row">
+            <div class="mb-3 col-md-4">
+            <label for="price">Price</label>
+         <input name="listing[price]" class="form-control" value="<%= listing.price%>"  type="number" id="price" required>
+                        <div class="invalid-feedback">Price should be valid</div>
+        </div>
+        <div class="mb-3 col-md-8">
+ <label for="location">Location</label>
+        <input name="listing[location]" class="form-control" value="<%= listing.location %>"  type="text" id="location" required>
+        <div class="invalid-feedback">Location should be valid</div>
+        </div>
+        </div>
+        
+       <div class="mb-3">
+        <label for="country">Country</label>
+        <input name="listing[country]" class="form-control"value="<%= listing.country %>" type="text" id="country" required>
+        <div class="invalid-feedback">Country should be valid</div>
+    </div>
+        <button type="submit" class="btn btn-dark add-btn">Edit</button>
+        <br><br><br>
+        </form>
+            </div>
+        </div>
+        
+
