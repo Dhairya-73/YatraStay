@@ -5,7 +5,39 @@ const Listing=require("./models/listing.js");
 const path=require("path");
 const methodOverride=require("method-override");
 const ejsmate=require("ejs-mate");
-const wrapAsync=require("./utils/wrapAsync.js")
+const Review=require("./models/review.js");
+const ExpressError=require("./utils/ExpressError.js");
+const {listingSchema,reviewSchema}=require("./ServerSchemaValidate.js");
+const listingrouter=require("./routes/listing.js");
+const reviewrouter=require("./routes/review.js");
+const session=require("express-session");
+const flash=require("connect-flash");
+const passport=require("passport");
+const LocalStrategy=require("passport-local");
+const User=require("./models/user.js");
+const userrouter=require("./routes/user.js");
+
+const sessionOptions={
+    secret:"Secretcode",
+    resave:false,
+    saveUninitialized:true,
+    cookie:{
+        expires:Date.now()+7*24*60*60*1000,
+        maxAge:7*24*60*60*1000,
+        httpOnly:true,
+    }
+};
+
+app.use(session(sessionOptions));
+app.use(flash());
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.use(new LocalStrategy(User.authenticate()));
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 app.set("view engine","ejs");
 app.set("path",path.join(__dirname,"views"));
@@ -28,76 +60,36 @@ async function main(){
     await mongoose.connect(Mongo_url);
 }
 
+
+
+
+
 app.get('/',(req,res)=>{
     res.send("hi,i am root");
 })
 
-app.get('/listings',async (req,res)=>{
-    const allListings= await Listing.find({});
-    res.render("./listings/index.ejs",{ allListings });
+app.use((req,res,next)=>{
+    res.locals.success=req.flash("success");
+    res.locals.error=req.flash("error");
+    res.locals.CurrUser=req.user;
+    next();
 })
-
-app.get('/listings/new',(req,res)=>{
-    res.render("./listings/new_form.ejs");
-})
-//always write listings/new ne uper then listings/:id 
-// kemke ae new ne id ne jem sodhe ane na made etle error aape if niche hoy toh.
-
-app.get('/listings/:id',async (req,res)=>{
-    let {id}=req.params;
-    const listing=await Listing.findById(id);
-    res.render("./listings/show.ejs",{listing});
-})
-
-app.post('/listings',wrapAsync(async (req,res)=>{
-    let newlisting=new Listing(req.body.listing);
-    console.log(newlisting);
-    await newlisting.save();
-    res.redirect("/listings");
-}));
-
-//Edit route
-app.get("/listings/:id/edit",async (req,res)=>{
-    let {id}=req.params;
-    const listing=await Listing.findById(id);
-    res.render("./listings/edit_form.ejs",{listing});
-})
-
-//Update route
-app.put("/listings/:id",async (req,res)=>{
-    let {id}=req.params;
-    await Listing.findByIdAndUpdate(id,{...req.body.listing});
-    res.redirect(`/listings/${id}`);
-})
-
-//Delete route
-app.delete("/listings/:id",async (req,res)=>{
-    let {id}=req.params;
-    const deletedListing=await Listing.findByIdAndDelete(id);
-    console.log(deletedListing);
-    res.redirect("/listings");
-})
-
-// app.use(
-//     (err,req,res,next)=>{
-//         res.send("something went wrong");
-//     }
-// )   
-
-// app.get('/testing',(req,res)=>{
-//     let sample=new Listing({
-//         title:"Grand Villa",
-//         description:"villa is good",
-//         price:1200,
-//         location:"ahmedabad",
-//         country:"india",
-//     });
-//     sample.save();
-//     console.log("sample was savd");
-//     res.send("succesful testing");
-// })
+app.use('/listings',listingrouter);
+app.use('/listings/:id/reviews',reviewrouter);
+app.use('/',userrouter);
 
 
+//if any page which is not exist req send send error
+app.use((req,res,next)=>{
+    next(new ExpressError(404,"page not found"));
+});
+
+app.use(
+    (err,req,res,next)=>{
+        let {statusCode=500,message="something went wrong"}=err;
+        res.render("error.ejs",{message});
+    }
+);   
 
 app.listen(8080,()=>{
     console.log("server is listening on port 8080");
