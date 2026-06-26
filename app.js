@@ -41,13 +41,14 @@ app.use("/reviews", require("./routes/review"));
 app.use("/ai-assistant", require("./routes/aiRoutes"));
 
 /* ================= DATABASE ================= */
+const MONGO_URL = process.env.MONGO_URL || "mongodb://127.0.0.1:27017/yatrastay";
 mongoose
-  .connect("mongodb://127.0.0.1:27017/yatrastay")
+  .connect(MONGO_URL)
   .then(() => console.log("MongoDB connected"))
   .catch(err => console.log(err));
 
 /* ================= SERVER ================= */
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`YatraStay running at http://localhost:${PORT}`);
+  console.log(`YatraStay running on port ${PORT}`);
 });
