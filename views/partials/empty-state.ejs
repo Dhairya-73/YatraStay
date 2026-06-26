@@ -1,0 +1,45 @@
+<!-- Reusable Empty State -->
+<!-- File: views/partials/empty-state.ejs -->
+
+<div class="empty-state text-center py-5 my-4 px-3">
+  <!-- Friendly SVG Travel Illustration -->
+  <div class="mb-4">
+    <svg width="140" height="140" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" class="mx-auto">
+      <circle cx="100" cy="100" r="80" fill="rgba(15, 23, 42, 0.03)"/>
+      <rect x="75" y="70" width="50" height="70" rx="6" fill="#F1F5F9" stroke="var(--color-primary-dark)" stroke-width="3"/>
+      <rect x="85" y="80" width="10" height="10" rx="2" fill="var(--color-accent-gold)"/>
+      <rect x="105" y="80" width="10" height="10" rx="2" fill="var(--color-accent-gold)"/>
+      <rect x="85" y="100" width="10" height="10" rx="2" fill="var(--color-accent-gold)"/>
+      <rect x="105" y="100" width="10" height="10" rx="2" fill="var(--color-accent-gold)"/>
+      <rect x="92" y="120" width="16" height="20" rx="2" fill="var(--color-primary-dark)"/>
+      <path d="M50 140H150" stroke="var(--color-primary-dark)" stroke-width="4" stroke-linecap="round"/>
+      <path d="M135 60C140 50 155 50 160 60L170 80" stroke="var(--color-text-muted)" stroke-width="2" stroke-linecap="round" stroke-dasharray="3 3"/>
+      <circle cx="160" cy="50" r="3" fill="var(--color-accent-gold)"/>
+    </svg>
+  </div>
+
+  <h3 class="fw-bold text-dark mb-2" style="font-family: 'Outfit', sans-serif;">No stays matched your search</h3>
+  <p class="text-muted max-width-600 mx-auto mb-4" style="font-size: 0.95rem; max-width: 500px;">
+    <%= locals.errorMessage || "We couldn't find any listings matching your exact criteria. Try broadening your parameters or ask Yatra Sathi." %>
+  </p>
+
+  <!-- Helpful Suggestions -->
+  <div class="suggestions-box text-start p-4 mb-4 mx-auto" style="max-width: 480px; background: var(--color-white); border: 1px solid var(--color-border); border-radius: var(--radius-card); box-shadow: var(--shadow-sm);">
+    <h6 class="fw-bold text-dark mb-2.5" style="font-size: 0.95rem;">Suggestions:</h6>
+    <ul class="text-muted small mb-0 ps-3" style="font-size: 0.85rem; line-height: 1.6;">
+      <li class="mb-2">Increase your search budget limits to view heritage stays.</li>
+      <li class="mb-2">Try another destination nearby (e.g. search "Goa" instead of a micro-locality).</li>
+      <li class="mb-0">Ask Yatra Sathi directly to seek custom matches from adjacent regions.</li>
+    </ul>
+  </div>
+
+  <!-- CTAs -->
+  <div class="d-flex justify-content-center gap-3">
+    <a href="/" class="btn btn-outline-dark rounded-pill px-4 py-2 fw-bold" style="font-size: 0.85rem;">
+      <i class="fa-solid fa-house me-1.5"></i> Go Home
+    </a>
+    <a href="/ai-assistant" class="btn btn-warning rounded-pill px-4 py-2 fw-bold text-dark shadow-sm" style="font-size: 0.85rem;">
+      <i class="fa-solid fa-wand-magic-sparkles me-1.5"></i> Ask Yatra Sathi
+    </a>
+  </div>
+</div>

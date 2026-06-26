@@ -1,0 +1,77 @@
+<%
+// Reusable AI Recommendation Badge and Insight Engine
+// File: views/partials/ai-badge.ejs
+
+let badges = [];
+const desc = (hotel.description || "").toLowerCase();
+const loc = (hotel.location || "").toLowerCase();
+const name = (hotel.name || "").toLowerCase();
+
+// 1. Beach Escape
+if (loc.includes("goa") || desc.includes("beach") || desc.includes("ocean") || desc.includes("sea") || desc.includes("waterfront")) {
+  badges.push({ 
+    type: "beach", 
+    label: "🏖 Beach Escape", 
+    insight: "Highly recommended for its direct access to scenic beachfronts and calming ocean views." 
+  });
+}
+
+// 2. Great for Workation
+if (desc.includes("wifi") || desc.includes("wi-fi") || desc.includes("workspace") || desc.includes("internet") || desc.includes("desk") || desc.includes("office")) {
+  badges.push({ 
+    type: "work", 
+    label: "💻 Great for Workation", 
+    insight: "Equipped with high-speed internet and quiet workspaces, perfect for remote professionals." 
+  });
+}
+
+// 3. Couples Favourite
+if (desc.includes("couple") || desc.includes("romantic") || desc.includes("cozy") || desc.includes("cosy") || desc.includes("honeymoon") || desc.includes("retreat") || desc.includes("private")) {
+  badges.push({ 
+    type: "couple", 
+    label: "❤️ Couples Favourite", 
+    insight: "Offers an intimate atmosphere, premium privacy, and charming views highly rated by couples." 
+  });
+}
+
+// 4. Family Friendly
+if (desc.includes("family") || desc.includes("villa") || desc.includes("spacious") || desc.includes("kids") || desc.includes("children") || desc.includes("pool") || desc.includes("garden")) {
+  badges.push({ 
+    type: "family", 
+    label: "👨‍👩‍👧 Family Friendly", 
+    insight: "Provides a spacious layout with group-friendly facilities and kid-safe spaces." 
+  });
+}
+
+// 5. Best Value
+// We can check if the price is below 4500 (or if custom average price is passed)
+const limitPrice = locals.avgPrice ? locals.avgPrice : 4500;
+if (hotel.price && hotel.price < limitPrice) {
+  badges.push({ 
+    type: "value", 
+    label: "💰 Best Value", 
+    insight: "Offers exceptional lodging comforts and convenient locations at a highly competitive price." 
+  });
+}
+
+// 6. Fallback: Best Match
+if (badges.length === 0) {
+  badges.push({ 
+    type: "match", 
+    label: "⭐ Best Match", 
+    insight: "Top choice reflecting consistent guest review ratings, verified comfort, and cleanliness." 
+  });
+}
+
+const primaryBadge = badges[0];
+%>
+
+<% if (locals.showOnlyText) { %>
+  <%= primaryBadge.insight %>
+<% } else if (locals.showBadgeOnly) { %>
+  <span class="badge-pill-custom badge-<%= primaryBadge.type %>"><%= primaryBadge.label %></span>
+<% } else { %>
+  <span class="card-badge-custom badge-<%= primaryBadge.type %>">
+    <%= primaryBadge.label %>
+  </span>
+<% } %>

@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Search Results - YatraStay</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="/css/theme.css">
+  
+  <style>
+    /* Premium Filter Chips Container */
+    .filter-chips-container {
+      display: flex;
+      overflow-x: auto;
+      gap: 10px;
+      padding: 10px 0 20px 0;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    .filter-chips-container::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Reusable Filter Chip */
+    .filter-chip {
+      background: var(--color-white);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-pill);
+      padding: 10px 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--color-text-main);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all var(--speed-fast) var(--easing-premium);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 44px; /* Tap target standard */
+      box-shadow: var(--shadow-sm);
+    }
+
+    .filter-chip i {
+      color: var(--color-text-muted);
+      font-size: 0.95rem;
+      transition: color var(--speed-fast) var(--easing-premium);
+    }
+
+    .filter-chip:hover {
+      border-color: var(--color-accent-gold);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .filter-chip.active {
+      background: var(--color-primary-dark);
+      color: var(--color-white);
+      border-color: var(--color-primary-dark);
+    }
+
+    .filter-chip.active i {
+      color: var(--color-accent-gold);
+    }
+
+    /* Custom AI Recommendation Badges on Cards */
+    .card-badge-custom {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: var(--radius-pill);
+      z-index: 5;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Custom color styling per AI recommendation type */
+    .badge-beach { background: rgba(14, 116, 144, 0.95); color: #cffafe; border: 1px solid rgba(14, 116, 144, 0.4); }
+    .badge-work { background: rgba(15, 23, 42, 0.95); color: #f8fafc; border: 1px solid rgba(245, 158, 11, 0.4); }
+    .badge-couple { background: rgba(190, 24, 74, 0.95); color: #ffe4e6; border: 1px solid rgba(190, 24, 74, 0.4); }
+    .badge-family { background: rgba(3, 105, 161, 0.95); color: #e0f2fe; border: 1px solid rgba(3, 105, 161, 0.4); }
+    .badge-value { background: rgba(21, 128, 61, 0.95); color: #dcfce7; border: 1px solid rgba(21, 128, 61, 0.4); }
+    .badge-match { background: rgba(180, 83, 9, 0.95); color: #fef3c7; border: 1px solid rgba(245, 158, 11, 0.4); }
+
+    /* Reusable property card override details */
+    .property-card {
+      background: var(--color-white);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: transform var(--speed-normal) var(--easing-premium), box-shadow var(--speed-normal) var(--easing-premium), border-color var(--speed-normal) var(--easing-premium);
+      height: 100%;
+    }
+
+    .property-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-hover);
+      border-color: rgba(245, 158, 11, 0.2);
+    }
+
+    .card-img-container img {
+      transition: transform var(--speed-normal) var(--easing-premium);
+    }
+
+    .property-card:hover .card-img-container img {
+      transform: scale(1.04);
+    }
+
+    /* Wishlist Heart Overlay */
+    .property-card .wishlist-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: transparent;
+      border: none;
+      color: #ffffff;
+      font-size: 1.4rem;
+      z-index: 10;
+      cursor: pointer;
+      transition: transform var(--speed-fast) var(--easing-premium), color var(--speed-fast) var(--easing-premium);
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.35));
+    }
+
+    .property-card .wishlist-btn:hover {
+      transform: scale(1.15);
+    }
+
+    .property-card .wishlist-btn.active {
+      color: #ef4444 !important;
+    }
+
+    /* AI Recommendation Insight box */
+    .ai-insight-box {
+      background: rgba(245, 158, 11, 0.04);
+      border: 1px solid rgba(245, 158, 11, 0.15);
+      border-radius: 8px;
+    }
+
+    .ai-insight-title {
+      color: #B45309; /* Dark Gold/Amber */
+      font-size: 0.75rem;
+    }
+
+    .ai-insight-text {
+      font-size: 0.8rem;
+      line-height: 1.45;
+      color: var(--color-text-muted);
+    }
+
+    /* Search Summary Card Styling */
+    .summary-banner {
+      background: var(--color-white);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .summary-metric {
+      border-right: 1px solid var(--color-border);
+      padding: 0 16px;
+    }
+
+    .summary-metric:last-child {
+      border-right: none;
+    }
+
+    .summary-metric-label {
+      display: block;
+      text-transform: uppercase;
+      font-weight: 700;
+      font-size: 0.7rem;
+      color: var(--color-text-muted);
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+
+    .summary-metric-value {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: var(--color-text-main);
+    }
+
+    /* Skeletons pulse animation styles */
+    @keyframes skeletonPulse {
+      0% { opacity: 0.6; }
+      50% { opacity: 1; }
+      100% { opacity: 0.6; }
+    }
+
+    .skeleton-card {
+      pointer-events: none;
+    }
+
+    .skeleton-shimmer-bg,
+    .skeleton-pulse-line,
+    .skeleton-pulse-box {
+      animation: skeletonPulse 1.5s infinite ease-in-out;
+      background: rgba(15, 23, 42, 0.06);
+      border-radius: 4px;
+    }
+
+    [data-theme="dark"] .skeleton-shimmer-bg,
+    [data-theme="dark"] .skeleton-pulse-line,
+    [data-theme="dark"] .skeleton-pulse-box {
+      background: rgba(241, 245, 249, 0.08);
+    }
+
+    .skeleton-pulse-line {
+      height: 12px;
+    }
+
+    .skeleton-title-line { height: 20px; width: 60%; }
+    .skeleton-rating-line { height: 18px; width: 15%; }
+    .skeleton-location-line { height: 14px; width: 40%; }
+    .skeleton-desc-line { height: 12px; width: 90%; }
+    .skeleton-price-line { height: 24px; width: 35%; }
+    .skeleton-btn-line { height: 36px; width: 35%; border-radius: var(--radius-pill); }
+    .skeleton-pulse-box { height: 52px; border-radius: 8px; }
+
+    /* Filter Suggestions gold hover outline */
+    .hover-gold:hover {
+      border-color: var(--color-accent-gold) !important;
+      color: var(--color-accent-gold) !important;
+      transform: translateY(-1px);
+    }
+
+    /* Fade transitions styling */
+    .transition-fade {
+      transition: opacity 300ms var(--easing-premium);
+    }
+
+    .line-clamp-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Mobile Edge-to-Edge Stays */
+    @media (max-width: 576px) {
+      .container-mobile-padding {
+        padding-left: 0;
+        padding-right: 0;
+      }
+      .property-card {
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        border-top: none;
+      }
+      .card-img-container {
+        border-radius: 0;
+      }
+      .hotel-card-col {
+        padding-left: 0;
+        padding-right: 0;
+      }
+      .empty-state {
+        padding-left: 15px;
+        padding-right: 15px;
+      }
+      .summary-metric {
+        border-right: none;
+        border-bottom: 1px solid var(--color-border);
+        padding: 10px 0;
+      }
+      .summary-metric:last-child {
+        border-bottom: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<%
+// Safe fallback for query parameter to prevent crashes on stale backend processes
+const query = locals.query ? locals.query : {};
+%>
+
+<%- include("partials/navbar") %>
+
+<div class="container py-5 container-mobile-padding" style="min-height: 80vh;">
+
+  <!-- 1. PERSONALIZED PAGE HEADER -->
+  <div class="px-3 px-sm-0 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+      <% if (query.ai === 'true') { %>
+        <div class="mb-2">
+          <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold text-uppercase d-inline-flex align-items-center gap-1.5" style="font-size: 0.72rem; letter-spacing: 0.05em; box-shadow: var(--shadow-sm);">
+            ✨ Selected by Yatra AI
+          </span>
+        </div>
+      <% } %>
+      <h2 class="fw-bold mb-1 text-dark animate-fade-in" style="font-family: 'Outfit', sans-serif;">
+        <% if (query.location && query.location.trim().length > 0) { %>
+          <%= hotels.length %> <%= hotels.length === 1 ? 'stay' : 'stays' %> found in <%= query.location.trim().charAt(0).toUpperCase() + query.location.trim().slice(1) %>
+        <% } else { %>
+          Showing the best stays matching your search
+        <% } %>
+      </h2>
+      <p class="text-muted small mb-0">Independently curated and optimized using real-time guest review criteria.</p>
+    </div>
+
+    <!-- Sort Selector -->
+    <div class="d-flex align-items-center gap-2">
+      <span class="small text-muted d-none d-sm-inline">Sort:</span>
+      <div class="d-flex gap-1">
+        <a href="?location=<%= query.location || '' %>&ai=<%= query.ai || '' %>" class="btn btn-sm btn-outline-dark rounded-pill px-3 <%= !query.sort ? 'active' : '' %>" style="font-size: 0.8rem;">
+          Featured
+        </a>
+        <a href="?location=<%= query.location || '' %>&sort=priceLow&ai=<%= query.ai || '' %>" class="btn btn-sm btn-outline-dark rounded-pill px-3 <%= query.sort === 'priceLow' ? 'active' : '' %>" style="font-size: 0.8rem;">
+          Low to High
+        </a>
+        <a href="?location=<%= query.location || '' %>&sort=priceHigh&ai=<%= query.ai || '' %>" class="btn btn-sm btn-outline-dark rounded-pill px-3 <%= query.sort === 'priceHigh' ? 'active' : '' %>" style="font-size: 0.8rem;">
+          High to Low
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <% if (hotels.length > 0) { %>
+    
+    <!-- 2. DYNAMIC SEARCH SUMMARY CARD -->
+    <div class="px-3 px-sm-0">
+      <%- include("partials/search-summary", { hotels, query }) %>
+    </div>
+
+    <!-- 3. PREMIUM FILTER CHIPS -->
+    <div class="px-3 px-sm-0 mb-4">
+      <div class="filter-chips-container">
+        <%- include("partials/filter-chip", { filter: 'beach', label: 'Beach Escape', icon: 'fa-umbrella-beach' }) %>
+        <%- include("partials/filter-chip", { filter: 'luxury', label: 'Luxury Stays', icon: 'fa-crown' }) %>
+        <%- include("partials/filter-chip", { filter: 'budget', label: 'Budget Friendly', icon: 'fa-wallet' }) %>
+        <%- include("partials/filter-chip", { filter: 'family', label: 'Family Friendly', icon: 'fa-users' }) %>
+        <%- include("partials/filter-chip", { filter: 'pool', label: 'Private Pool', icon: 'fa-water' }) %>
+        <%- include("partials/filter-chip", { filter: 'wifi', label: 'High-speed WiFi', icon: 'fa-wifi' }) %>
+        <%- include("partials/filter-chip", { filter: 'parking', label: 'Free Parking', icon: 'fa-square-parking' }) %>
+        <%- include("partials/filter-chip", { filter: 'pet friendly', label: 'Pet Friendly', icon: 'fa-paw' }) %>
+      </div>
+    </div>
+
+    <!-- 4. SKELETON LOADING GRID -->
+    <div id="skeletonGrid" class="row g-4 transition-fade">
+      <% for (let i = 0; i < Math.max(3, hotels.length); i++) { %>
+        <div class="col-lg-4 col-md-6 col-sm-12">
+          <%- include("partials/skeleton-card") %>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- 5. ACTUAL PROPERTY LISTINGS GRID -->
+    <div class="row g-4 transition-fade d-none" id="actualGrid" style="opacity: 0;">
+      <% hotels.forEach(hotel => { %>
+        <div class="col-lg-4 col-md-6 col-sm-12 hotel-card-col" 
+             data-price="<%= hotel.price %>" 
+             data-description="<%= hotel.description.toLowerCase() %>"
+             data-name="<%= hotel.name.toLowerCase() %>"
+             data-location="<%= hotel.location.toLowerCase() %>">
+          <%- include("partials/property-card", { hotel }) %>
+        </div>
+      <% }) %>
+    </div>
+
+  <% } else { %>
+    
+    <!-- 6. GORGEOUS EMPTY STATE -->
+    <div class="px-3">
+      <%- include("partials/empty-state") %>
+    </div>
+
+  <% } %>
+
+  <!-- 7. SMART CONTEXTUAL AI SEARCH SUGGESTIONS -->
+  <div id="aiSearchSuggestions" class="<%= hotels.length <= 2 ? '' : 'd-none' %> mb-5 mt-5 px-3 px-sm-0">
+    <div class="card border-0 p-4 shadow-sm" style="border-radius: var(--radius-card); background: linear-gradient(135deg, rgba(245, 158, 11, 0.04) 0%, rgba(245, 158, 11, 0.08) 100%); border: 1px dashed rgba(245, 158, 11, 0.2) !important;">
+      <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+        <div>
+          <h5 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2" style="font-family: 'Outfit', sans-serif;">
+            <i class="fa-solid fa-wand-magic-sparkles text-warning"></i> Need help? Ask Yatra AI
+          </h5>
+          <p class="text-muted small mb-0">Get customized recommendations based on what you are looking for:</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+          <%
+          let suggestions = [];
+          const locQuery = (query.location || "").toLowerCase().trim();
+          if (locQuery.includes("goa")) {
+            suggestions = [
+              { label: "🏖 Beach Villa", query: "Find me a beachfront villa in Goa" },
+              { label: "🏊 Pool Stay", query: "Villas in Goa with a private swimming pool" },
+              { label: "👑 Luxury Resort", query: "Luxury stays in Goa with premium amenities" },
+              { label: "❤️ Couples Stay", query: "Romantic stays in Goa for couples" }
+            ];
+          } else if (locQuery.includes("manali")) {
+            suggestions = [
+              { label: "🏡 Mountain Cabin", query: "Cozy mountain cabin in Manali" },
+              { label: "❄️ Snow View", query: "Stays in Manali with snow peak views" },
+              { label: "🔥 Bonfire Stay", query: "Cottages in Manali with a bonfire setup" },
+              { label: "✨ Weekend Escape", query: "Peaceful weekend getaway in Manali" }
+            ];
+          } else {
+            suggestions = [
+              { label: "❤️ Romantic Stay", query: "Find me a romantic cozy stay" },
+              { label: "💎 Luxury under ₹6000", query: "Luxury stays under ₹6000 with premium ratings" },
+              { label: "🐾 Pet Friendly Stays", query: "Stays that are pet friendly with spacious gardens" },
+              { label: "💻 High-Speed WiFi", query: "Stays with high-speed internet and quiet workspace" }
+            ];
+          }
+          suggestions.forEach(item => {
+          %>
+            <a href="/ai-assistant?query=<%= encodeURIComponent(item.query) %>" class="btn btn-sm btn-white border rounded-pill shadow-sm px-3 py-2 fw-semibold hover-gold text-dark bg-white" style="font-size: 0.8rem;">
+              <%= item.label %>
+            </a>
+          <% }) %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. CONTINUE EXPLORING SECTION -->
+  <div class="px-3 px-sm-0">
+    <%
+    // Select Related Properties from database: same location or similar price range, excluding already matched hotels
+    const matchedIds = hotels.map(h => h._id.toString());
+    let related = locals.allHotels ? allHotels.filter(h => !matchedIds.includes(h._id.toString())) : [];
+
+    if (query.location && query.location.trim().length > 0) {
+      const locLower = query.location.trim().toLowerCase();
+      let locationRelated = related.filter(h => h.location.toLowerCase().includes(locLower));
+      if (locationRelated.length > 0) {
+        related = locationRelated;
+      }
+    }
+
+    if (hotels.length > 0) {
+      const prices = hotels.map(h => h.price);
+      const avgPrice = Math.round(prices.reduce((sum, p) => sum + p, 0) / hotels.length);
+      // Sort related stays by price closeness
+      related.sort((a, b) => Math.abs(a.price - avgPrice) - Math.abs(b.price - avgPrice));
+    }
+
+    const exploreStays = related.slice(0, 3);
+    %>
+
+    <% if (exploreStays.length > 0) { %>
+      <div class="mt-5 pt-4 border-top">
+        <h3 class="fw-bold mb-1 text-dark" style="font-family: 'Outfit', sans-serif;">Continue Exploring</h3>
+        <p class="text-muted small mb-4">Other recommendations matching local profiles or competitive price brackets.</p>
+        
+        <div class="row g-4">
+          <% exploreStays.forEach(h => { %>
+            <div class="col-lg-4 col-md-6 col-sm-12">
+              <%- include("partials/property-card", { hotel: h }) %>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- 9. EMPTY STATE GRID CONTAINER (Hidden by default, shown via JS filter matches) -->
+  <div id="emptyStateContainer" class="d-none">
+    <%- include("partials/empty-state", { errorMessage: "No listings match the selected combination of filter chips." }) %>
+  </div>
+
+</div>
+
+<%- include("partials/footer") %>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const skeletonGrid = document.getElementById("skeletonGrid");
+    const actualGrid = document.getElementById("actualGrid");
+    const emptyStateContainer = document.getElementById("emptyStateContainer");
+    const chips = document.querySelectorAll(".filter-chip");
+    const cards = document.querySelectorAll(".hotel-card-col");
+    const suggestionsBox = document.getElementById("aiSearchSuggestions");
+
+    // 1. SKELETON REMOVAL AFTER DOM & ASSETS LOADING
+    window.addEventListener("load", () => {
+      if (skeletonGrid && actualGrid) {
+        skeletonGrid.style.opacity = "0";
+        setTimeout(() => {
+          skeletonGrid.classList.add("d-none");
+          actualGrid.classList.remove("d-none");
+          setTimeout(() => {
+            actualGrid.style.opacity = "1";
+          }, 50);
+        }, 300);
+      }
+    });
+
+    // 2. CLIENT-SIDE MULTI-SELECT CHIPS FILTERING SYSTEM
+    if (chips.length > 0) {
+      chips.forEach(chip => {
+        chip.addEventListener("click", () => {
+          // Toggle active classes
+          const isActive = chip.classList.toggle("active");
+          chip.setAttribute("aria-pressed", isActive ? "true" : "false");
+          
+          applyFilters();
+        });
+      });
+    }
+
+    function applyFilters() {
+      const activeChips = Array.from(document.querySelectorAll(".filter-chip.active"));
+      const activeFilters = activeChips.map(c => c.getAttribute("data-filter"));
+
+      // Trigger 200ms quick skeleton shimmer transition for premium feel
+      if (skeletonGrid && actualGrid) {
+        actualGrid.style.opacity = "0";
+        skeletonGrid.classList.remove("d-none");
+        skeletonGrid.style.opacity = "1";
+
+        setTimeout(() => {
+          let visibleCount = 0;
+
+          cards.forEach(col => {
+            const price = parseInt(col.getAttribute("data-price"));
+            const desc = col.getAttribute("data-description");
+            const name = col.getAttribute("data-name");
+            const loc = col.getAttribute("data-location");
+
+            let matchAll = true;
+
+            activeFilters.forEach(filter => {
+              let isMatch = false;
+              if (filter === "beach") {
+                isMatch = loc.includes("goa") || desc.includes("beach") || desc.includes("ocean") || desc.includes("sea") || desc.includes("waterfront");
+              } else if (filter === "luxury") {
+                isMatch = price >= 4500;
+              } else if (filter === "budget") {
+                isMatch = price < 4500;
+              } else if (filter === "family") {
+                isMatch = desc.includes("family") || desc.includes("villa") || desc.includes("spacious") || desc.includes("kids") || desc.includes("children") || desc.includes("garden");
+              } else if (filter === "pool") {
+                isMatch = desc.includes("pool") || desc.includes("swimming");
+              } else if (filter === "wifi") {
+                isMatch = desc.includes("wifi") || desc.includes("wi-fi") || desc.includes("internet");
+              } else if (filter === "parking") {
+                isMatch = desc.includes("parking") || desc.includes("garage") || desc.includes("car");
+              } else if (filter === "pet friendly") {
+                isMatch = desc.includes("pet") || desc.includes("dog") || desc.includes("cat") || desc.includes("friendly");
+              }
+
+              if (!isMatch) {
+                matchAll = false;
+              }
+            });
+
+            if (matchAll) {
+              col.classList.remove("d-none");
+              visibleCount++;
+            } else {
+              col.classList.add("d-none");
+            }
+          });
+
+          // Smooth reveal logic
+          skeletonGrid.style.opacity = "0";
+          setTimeout(() => {
+            skeletonGrid.classList.add("d-none");
+
+            if (visibleCount === 0) {
+              actualGrid.classList.add("d-none");
+              emptyStateContainer.classList.remove("d-none");
+            } else {
+              emptyStateContainer.classList.add("d-none");
+              actualGrid.classList.remove("d-none");
+              setTimeout(() => {
+                actualGrid.style.opacity = "1";
+              }, 50);
+            }
+
+            // Dynamically show AI Search Suggestions if count is low
+            if (suggestionsBox) {
+              if (visibleCount <= 2) {
+                suggestionsBox.classList.remove("d-none");
+              } else {
+                suggestionsBox.classList.add("d-none");
+              }
+            }
+          }, 150);
+
+        }, 200); // Shimmer timeout
+      }
+    }
+  });
+</script>
+</body>
+</html>

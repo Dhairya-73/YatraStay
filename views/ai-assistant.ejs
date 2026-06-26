@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yatra Sathi - AI Travel Assistant</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="/css/theme.css">
+  
+  <style>
+    /* Premium Chat Assistant Layout */
+    .chat-container {
+      background: var(--color-white);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      flex-direction: column;
+      height: 640px;
+    }
+    
+    .chat-header {
+      background: var(--color-primary-dark);
+      color: var(--color-white);
+      padding: 18px 24px;
+      border-top-left-radius: 14px;
+      border-top-right-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .chat-header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .chat-header-left i {
+      font-size: 1.4rem;
+      color: var(--color-accent-gold);
+    }
+    
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      background: var(--color-bg-base);
+    }
+    
+    .chat-bubble {
+      max-width: 85%;
+      padding: 12px 18px;
+      border-radius: 16px;
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+    
+    .chat-bubble.ai {
+      background: var(--color-white);
+      color: var(--color-text-main);
+      align-self: flex-start;
+      border: 1px solid var(--color-border);
+      border-top-left-radius: 4px;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .chat-bubble.user {
+      background: var(--color-primary-dark);
+      color: var(--color-white);
+      align-self: flex-end;
+      border-top-right-radius: 4px;
+    }
+    
+    /* Dynamic Suggestion Chips styling */
+    .prompt-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+    
+    .chip {
+      background: var(--color-white);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-pill);
+      padding: 8px 16px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--color-text-main);
+      transition: all var(--speed-fast) var(--easing-premium);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .chip:hover {
+      background: var(--color-accent-gold);
+      color: #0f172a;
+      border-color: var(--color-accent-gold);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+    
+    .chat-input-area {
+      padding: 16px 24px;
+      border-top: 1px solid var(--color-border);
+      background: var(--color-white);
+      border-bottom-left-radius: 14px;
+      border-bottom-right-radius: 14px;
+    }
+
+    .chat-input-pill {
+      background: var(--color-bg-base);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-pill);
+      padding: 6px 6px 6px 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all var(--speed-fast) var(--easing-premium);
+    }
+
+    .chat-input-pill:focus-within {
+      border-color: var(--color-accent-gold);
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+      background: var(--color-white);
+    }
+
+    .chat-input-pill input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      outline: none;
+      font-size: 0.92rem;
+      color: var(--color-text-main);
+      padding: 8px 0;
+    }
+    
+    /* Bouncing Typing Animation */
+    .typing-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 12px 18px;
+      background: var(--color-white);
+      border: 1px solid var(--color-border);
+      border-radius: 16px;
+      border-top-left-radius: 4px;
+      align-self: flex-start;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .typing-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--color-text-muted);
+      border-radius: 50%;
+      animation: bounce 1.4s infinite ease-in-out both;
+    }
+    
+    .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+    .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+    
+    @keyframes bounce {
+      0%, 80%, 100% { transform: scale(0); }
+      40% { transform: scale(1.0); }
+    }
+    
+    /* Recommendations Section */
+    .recs-container {
+      background: var(--color-white);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-lg);
+      padding: 24px;
+      min-height: 640px;
+    }
+    
+    .card-badge-custom {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: var(--radius-pill);
+      z-index: 5;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .badge-match {
+      background: #FEF3C7;
+      color: #D97706;
+      border: 1px solid rgba(245, 158, 11, 0.25);
+    }
+
+    .property-card {
+      background: var(--color-white);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: transform var(--speed-normal) var(--easing-premium), box-shadow var(--speed-normal) var(--easing-premium), border-color var(--speed-normal) var(--easing-premium);
+      height: 100%;
+    }
+
+    .property-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-hover);
+      border-color: rgba(245, 158, 11, 0.2);
+    }
+
+    .ai-insight-box {
+      background: rgba(245, 158, 11, 0.04);
+      border: 1px solid rgba(245, 158, 11, 0.15);
+      border-radius: 8px;
+    }
+
+    .ai-insight-title {
+      color: #B45309;
+      font-size: 0.75rem;
+    }
+
+    .ai-insight-text {
+      font-size: 0.8rem;
+      line-height: 1.45;
+      color: var(--color-text-muted);
+    }
+
+    /* Animation effects */
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-slide-up {
+      animation: slideUp var(--speed-normal) var(--easing-premium) forwards;
+    }
+
+    .wand-pulse {
+      animation: pulseGlow 2s infinite ease-in-out;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { filter: drop-shadow(0 0 2px rgba(245, 158, 11, 0.4)); }
+      50% { filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.8)); }
+    }
+  </style>
+</head>
+<body>
+
+<%- include("partials/navbar") %>
+
+<div class="container py-5">
+  <div class="row g-4">
+    
+    <!-- Left Column: AI Chat Panel -->
+    <div class="col-lg-5 col-md-12">
+      <div class="chat-container">
+        
+        <!-- Header widget -->
+        <div class="chat-header">
+          <div class="chat-header-left">
+            <i class="fa-solid fa-wand-magic-sparkles wand-pulse"></i>
+            <div>
+              <h5 class="m-0 fw-bold" style="font-family: 'Outfit', sans-serif;">Yatra Sathi</h5>
+              <small class="text-white-50" style="font-size:0.75rem;"><i class="fa-solid fa-circle text-success me-1" style="font-size: 6px;"></i> Online | Travel Planner</small>
+            </div>
+          </div>
+          <button class="btn btn-sm btn-outline-light rounded-pill px-2.5 py-1" onclick="document.getElementById('chatMessages').innerHTML = ''; location.reload();" title="Clear chat and reset" style="font-size:0.7rem;">
+            <i class="fa-solid fa-rotate-right"></i> Reset
+          </button>
+        </div>
+        
+        <!-- Chat body log -->
+        <div class="chat-messages" id="chatMessages">
+          
+          <!-- Initial AI Greeting bubble -->
+          <div class="chat-bubble ai animate-slide-up">
+            Hello! I am Yatra Sathi, your travel companion. Ask me to query and filter properties using natural requests.
+            <br><br>
+            Try saying something like:
+            <strong>"Find me a villa in Goa under ₹8000 with pool and ac"</strong>
+            
+            <% if (locals.history && history.length > 0) { %>
+              <div class="mt-3 pt-3 border-top">
+                <small class="text-muted d-block mb-2"><i class="fa-solid fa-clock-rotate-left"></i> Previous Searches:</small>
+                <div class="d-flex flex-wrap gap-1 mb-2">
+                  <% history.forEach(item => { %>
+                    <div class="chip text-truncate text-muted" style="max-width: 180px; font-size:0.75rem;" onclick="applySuggestion('<%= item.query %>')" title="<%= item.query %>">
+                      🔍 <%= item.query %>
+                    </div>
+                  <% }) %>
+                </div>
+              </div>
+            <% } %>
+
+            <div class="prompt-chips">
+              <div class="chip" onclick="applySuggestion('Find me a budget stay in Goa')">Goa Budget Stays</div>
+              <div class="chip" onclick="applySuggestion('Luxury hotels in Jaipur under ₹5000')">Jaipur Heritage</div>
+              <div class="chip" onclick="applySuggestion('Mountain retreat in Manali')">Manali Mountain Ret.</div>
+              <div class="chip" onclick="applySuggestion('Find me a stay in Bangalore with wifi and workspace')">Bangalore Workation</div>
+            </div>
+          </div>
+
+        </div>
+        
+        <!-- Input Text Pill -->
+        <div class="chat-input-area">
+          <form id="chatForm">
+            <div class="chat-input-pill shadow-sm">
+              <input 
+                type="text" 
+                id="chatInput" 
+                placeholder="Ask Yatra Sathi..." 
+                required 
+                autocomplete="off"
+              >
+              <button type="submit" id="sendBtn" class="btn btn-warning rounded-circle d-flex align-items-center justify-content-center" style="width:36px; height:36px; padding:0;">
+                <i class="fa-solid fa-paper-plane text-dark fs-6" style="margin-left:-1px;"></i>
+              </button>
+            </div>
+          </form>
+        </div>
+        
+      </div>
+    </div>
+    
+    <!-- Right Column: Grounded Recommendations listings grid -->
+    <div class="col-lg-7 col-md-12">
+      <div class="recs-container">
+        
+        <h4 class="fw-bold mb-3 d-flex align-items-center gap-2 text-dark" style="font-family: 'Outfit', sans-serif;">
+          <i class="fa-solid fa-hotel text-warning"></i>
+          AI Recommended Stays
+        </h4>
+        
+        <!-- Summary Box -->
+        <div id="summaryBox" class="alert alert-info border-0 shadow-sm d-none animate-slide-up" style="border-radius: 12px; background: rgba(14, 116, 144, 0.05); color: #0e7490; border: 1px solid rgba(14, 116, 144, 0.1) !important; font-size: 0.9rem; line-height:1.5;">
+          <!-- Loaded dynamically -->
+        </div>
+
+        <div id="recsPlaceholder" class="text-center py-5 my-5 text-muted">
+          <i class="fa-solid fa-comment-dots fa-3x mb-3 text-secondary opacity-50"></i>
+          <h5>No queries submitted yet</h5>
+          <p class="small text-muted" style="max-width:320px; margin:0 auto;">Ask Yatra Sathi on the left to pull properties matching your description.</p>
+        </div>
+
+        <!-- Skeletons Loader (Hidden by default) -->
+        <div id="recsSkeleton" class="d-none">
+          <div class="alert alert-light border border-secondary-subtle py-3 mb-4 rounded-3 skeleton-pulse-box" style="height:56px;"></div>
+          <div class="row g-3">
+            <div class="col-md-6 col-12">
+              <%- include("partials/skeleton-card") %>
+            </div>
+            <div class="col-md-6 col-12">
+              <%- include("partials/skeleton-card") %>
+            </div>
+          </div>
+        </div>
+
+        <!-- Listing Cards target grid -->
+        <div class="row g-3" id="listingsContainer">
+          <!-- Loaded dynamically -->
+        </div>
+
+      </div>
+    </div>
+    
+  </div>
+</div>
+
+<%- include("partials/footer") %>
+
+<script src="/js/ai-assistant.js"></script>
+<script>
+  // Simple prompt chips hooks
+  function applySuggestion(text) {
+    const input = document.getElementById("chatInput");
+    const form = document.getElementById("chatForm");
+    if (input && form) {
+      input.value = text;
+      form.dispatchEvent(new Event('submit'));
+    }
+  }
+</script>
+</body>
+</html>

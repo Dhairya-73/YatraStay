@@ -1,0 +1,59 @@
+<%
+// Reusable Search Summary Card
+// File: views/partials/search-summary.ejs
+
+const count = hotels.length;
+let minPrice = 0;
+let maxPrice = 0;
+let avgPrice = 0;
+
+if (count > 0) {
+  const prices = hotels.map(h => h.price);
+  minPrice = Math.min(...prices);
+  maxPrice = Math.max(...prices);
+  avgPrice = Math.round(prices.reduce((sum, p) => sum + p, 0) / count);
+}
+
+const q = locals.query ? query : {};
+const destName = q.location ? q.location.trim().charAt(0).toUpperCase() + q.location.trim().slice(1) : 'All Stays';
+%>
+
+<div class="summary-banner mb-4">
+  <div class="row text-center text-sm-start g-3">
+    <!-- Destination -->
+    <div class="col-6 col-sm-3 summary-metric">
+      <small class="summary-metric-label">Destination</small>
+      <span class="summary-metric-value text-truncate d-block" title="<%= destName %>"><%= destName %></span>
+    </div>
+    
+    <!-- Stays Count -->
+    <div class="col-6 col-sm-3 summary-metric">
+      <small class="summary-metric-label">Properties</small>
+      <span class="summary-metric-value"><%= count %> <%= count === 1 ? 'Stay' : 'Stays' %></span>
+    </div>
+    
+    <!-- Average Price -->
+    <div class="col-6 col-sm-2 summary-metric">
+      <small class="summary-metric-label">Average Cost</small>
+      <span class="summary-metric-value">
+        <%= count > 0 ? '₹' + avgPrice.toLocaleString("en-IN") : '--' %>
+      </span>
+    </div>
+
+    <!-- Lowest Price -->
+    <div class="col-6 col-sm-2 summary-metric">
+      <small class="summary-metric-label">Lowest Price</small>
+      <span class="summary-metric-value text-success">
+        <%= count > 0 ? '₹' + minPrice.toLocaleString("en-IN") : '--' %>
+      </span>
+    </div>
+
+    <!-- Highest Price -->
+    <div class="col-6 col-sm-2 summary-metric">
+      <small class="summary-metric-label">Highest Price</small>
+      <span class="summary-metric-value">
+        <%= count > 0 ? '₹' + maxPrice.toLocaleString("en-IN") : '--' %>
+      </span>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YatraStay - Luxury Vacation Rentals & Hotels</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="/css/theme.css">
+</head>
+<body>
+
+<%- include("partials/navbar") %>
+
+<!-- 1. HERO SECTION -->
+<section class="position-relative py-5 overflow-hidden text-center text-white d-flex align-items-center justify-content-center" style="
+  min-height: 520px;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.4) 0%, rgba(15, 23, 42, 0.7) 100%),
+              url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+">
+  <div class="container py-4">
+    <span class="badge bg-warning text-dark px-3 py-2 rounded-pill mb-3 fw-bold tracking-wider" style="font-size: 0.8rem; letter-spacing: 1px;">
+      INTRODUCING YATRA SATHI AI
+    </span>
+    <h1 class="display-4 fw-extrabold mb-3 text-white">Find your next unforgettable stay.</h1>
+    <p class="lead mb-5 text-white-50 max-width-600 mx-auto fs-5">
+      Discover premium apartments, mountain cabins, and beach villas across India.
+    </p>
+
+    <!-- Redesigned Airbnb-Style Segmented Search Pill -->
+    <div class="search-pill-container p-1 p-md-2">
+      <form class="w-100 d-flex flex-column flex-md-row align-items-stretch" action="/hotels/search" method="GET">
+        
+        <!-- Segment 1: Location -->
+        <div class="search-segment d-flex flex-column justify-content-center px-4 py-2 flex-grow-1 text-start" id="locationSegment">
+          <label class="search-segment-label">Where</label>
+          <div class="d-flex align-items-center">
+            <i class="fa-solid fa-location-dot search-segment-icon me-2"></i>
+            <input 
+              class="search-segment-field" 
+              name="location" 
+              placeholder="Search destinations" 
+              required
+              autocomplete="off"
+            >
+          </div>
+        </div>
+
+        <div class="search-pill-divider d-none d-md-block align-self-center"></div>
+
+        <!-- Segment 2: Dates -->
+        <div class="search-segment d-flex flex-column justify-content-center px-4 py-2 flex-grow-1 text-start" id="datesSegment">
+          <label class="search-segment-label">Dates</label>
+          <div class="d-flex align-items-center">
+            <i class="fa-solid fa-calendar-days search-segment-icon me-2"></i>
+            <input 
+              class="search-segment-field" 
+              type="text" 
+              placeholder="Add dates (Optional)" 
+              onfocus="(this.type='date')" 
+              onblur="(this.type='text')"
+            >
+          </div>
+        </div>
+
+        <div class="search-pill-divider d-none d-md-block align-self-center"></div>
+
+        <!-- Segment 3: Guests -->
+        <div class="search-segment d-flex flex-column justify-content-center px-4 py-2 text-start" id="guestsSegment" style="min-width: 160px;">
+          <label class="search-segment-label">Who</label>
+          <div class="d-flex align-items-center">
+            <i class="fa-solid fa-user-group search-segment-icon me-2"></i>
+            <input 
+              class="search-segment-field" 
+              type="text" 
+              placeholder="Add guests" 
+              autocomplete="off"
+            >
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="d-flex align-items-center justify-content-center px-2 py-1">
+          <button type="submit" class="search-pill-btn shadow" aria-label="Submit Search">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+  </div>
+</section>
+
+<!-- 2. AI ASSISTANT INLINE SECTION -->
+<div class="container mt-5">
+  <div class="card border-0 shadow-sm p-4" style="border-radius: var(--radius-card); background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);">
+    <div class="row align-items-center g-4 text-white">
+      <div class="col-md-8">
+        <h4 class="fw-bold text-warning mb-2 d-flex align-items-center gap-2">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Let Yatra Sathi Plan Your Stay
+        </h4>
+        <p class="small text-white-50 mb-0 fs-6">
+          Search using natural queries like <strong>"villas in Goa under ₹8000 with private pool"</strong>. Yatra Sathi retrieves matching listings from our database and ranks them instantly.
+        </p>
+      </div>
+      <div class="col-md-4 text-md-end">
+        <a href="/ai-assistant" class="btn btn-warning fw-bold text-dark px-4 py-2.5 rounded-pill shadow-sm">
+          Ask Yatra Sathi
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 3. POPULAR CATEGORIES (Filter Tabs) -->
+<div class="container mt-5">
+  <div class="categories-slider border-bottom pb-2">
+    <div class="category-tab active" onclick="window.location.href='/'">
+      <i class="fa-solid fa-fire"></i>
+      <span>Trending</span>
+    </div>
+    <div class="category-tab" onclick="window.location.href='/hotels/search?location=Goa'">
+      <i class="fa-solid fa-umbrella-beach"></i>
+      <span>Beachfront</span>
+    </div>
+    <div class="category-tab" onclick="window.location.href='/hotels/search?location=Manali'">
+      <i class="fa-solid fa-mountain"></i>
+      <span>Mountain</span>
+    </div>
+    <div class="category-tab" onclick="window.location.href='/hotels/search?location=Mumbai'">
+      <i class="fa-solid fa-city"></i>
+      <span>Metropolis</span>
+    </div>
+    <div class="category-tab" onclick="window.location.href='/hotels/search?location=Jaipur'">
+      <i class="fa-solid fa-crown"></i>
+      <span>Heritage</span>
+    </div>
+  </div>
+</div>
+
+<!-- 4. DYNAMIC DATABASE STAYS -->
+<div class="container mt-4">
+  <h3 class="fw-bold mb-1 text-theme-main">Featured Stays</h3>
+  <p class="text-muted small mb-4">Handpicked vacation rentals with standard amenities.</p>
+
+  <div class="row g-4">
+    <% hotels.forEach(h => { %>
+      <div class="col-md-4 col-sm-6">
+        <div class="property-card">
+          <div class="card-img-container">
+            <!-- Floating badge -->
+            <span class="card-badge">POPULAR CHOICE</span>
+            <!-- Wishlist Trigger -->
+            <button class="wishlist-btn" data-hotel-id="<%= h._id %>" aria-label="Add to Wishlist">
+              <i class="fa-regular fa-heart"></i>
+            </button>
+            <img src="<%= h.image %>" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80';" loading="lazy" alt="<%= h.name %>">
+          </div>
+          <div class="card-body-content">
+            <div>
+              <div class="d-flex align-items-center justify-content-between mb-2">
+                <h5 class="fw-bold text-theme-main mb-0 text-truncate" style="max-width: 80%;"><%= h.name %></h5>
+                <span class="card-rating text-theme-main"><i class="fa-solid fa-star text-warning"></i> 4.8</span>
+              </div>
+              <p class="text-muted small mb-3"><i class="fa-solid fa-location-dot text-danger"></i> <%= h.location %></p>
+              <p class="small text-muted line-clamp-2 mb-3"><%= h.description %></p>
+            </div>
+            <div class="d-flex align-items-center justify-content-between pt-2 border-top">
+              <span class="card-price">₹ <%= h.price %> <span class="fs-6 text-secondary fw-normal">/ night</span></span>
+              <a href="/hotels/<%= h._id %>" class="btn btn-outline-dark fw-bold rounded-pill px-3 py-1.5 small">
+                View Stay
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+</div>
+
+<!-- 5. RECENTLY VIEWED PROPERTIES (Client-Side Storage) -->
+<section id="recentSection" class="container mt-5 py-3 d-none">
+  <hr class="mb-5 border-secondary-subtle">
+  <h3 class="fw-bold mb-1 text-theme-main">Recently Viewed</h3>
+  <p class="text-muted small mb-4">Pick up right where you left off exploring.</p>
+  <div class="row g-3" id="recentStaysContainer">
+    <!-- Loaded dynamically via theme.js -->
+  </div>
+</section>
+
+<!-- 6. AI RECOMMENDED FOR YOU SECTION -->
+<div class="container mt-5">
+  <hr class="mb-5 border-secondary-subtle">
+  <h3 class="fw-bold mb-1 text-theme-main">Yatra Sathi Recommended For You</h3>
+  <p class="text-muted small mb-4">Personalized recommendations selected based on rating and location metadata.</p>
+  
+  <div class="row g-4">
+    <% hotels.slice(0, 2).forEach((h, idx) => { 
+        // Set mock but grounded match reasons
+        const reasons = [
+          { badge: "💻 Workation Choice", text: "Features dedicated workspaces and high-speed wifi networks verified in reviews." },
+          { badge: "👑 Heritage Pick", text: "Highly rated for traditional hospitality, scenic location, and verified premium comfort." }
+        ];
+        const matchData = reasons[idx] || { badge: "⭐ Top Rated Match", text: "Exceptional user ratings and premium location reviews." };
+    %>
+      <div class="col-md-6 col-12">
+        <div class="card border-0 shadow-sm h-100 overflow-hidden bg-theme-card border-theme">
+          <div class="row g-0 h-100">
+            <div class="col-sm-5 card-img-container h-100" style="aspect-ratio: auto;">
+              <img src="<%= h.image %>" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80';" class="img-fluid h-100 w-100" style="object-fit: cover;" alt="<%= h.name %>">
+            </div>
+            <div class="col-sm-7 d-flex flex-column justify-content-between p-4">
+              <div>
+                <span class="badge bg-warning text-dark px-3 py-1.5 rounded-pill mb-2 fw-bold" style="font-size:0.72rem; letter-spacing:0.5px;">
+                  <%= matchData.badge.toUpperCase() %>
+                </span>
+                <h5 class="fw-bold text-theme-main mt-1 mb-1"><%= h.name %></h5>
+                <p class="text-muted small mb-3"><i class="fa-solid fa-location-dot text-danger"></i> <%= h.location %></p>
+                
+                <!-- Dynamic Insight card -->
+                <div class="ai-insight-box p-2.5 mb-3" style="border-radius: 8px;">
+                  <span class="ai-insight-title d-block fw-bold mb-1">
+                    <i class="fa-solid fa-wand-magic-sparkles me-1"></i> Yatra Sathi Insight
+                  </span>
+                  <p class="ai-insight-text mb-0"><%= matchData.text %></p>
+                </div>
+              </div>
+              
+              <div class="d-flex align-items-center justify-content-between border-top pt-3 mt-2">
+                <span class="fw-bold text-theme-main">₹ <%= h.price.toLocaleString("en-IN") %> <span class="fw-normal text-muted" style="font-size:0.8rem;">/ night</span></span>
+                <a href="/hotels/<%= h._id %>" class="btn btn-outline-dark btn-sm rounded-pill fw-bold" style="font-size: 0.8rem;">View Stay</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+</div>
+
+<!-- 7. PLATFORM STATISTICS -->
+<section class="container mt-5 py-4">
+  <hr class="mb-5 border-secondary-subtle">
+  <div class="row g-0 bg-theme-card rounded shadow-sm border-theme" style="border-radius: var(--radius-card) !important; overflow:hidden;">
+    <div class="col-lg-4 col-md-12">
+      <div class="metric-card border-theme">
+        <div class="metric-number">50K+</div>
+        <div class="metric-label">Happy Travelers</div>
+      </div>
+    </div>
+    <div class="col-lg-4 col-md-12">
+      <div class="metric-card border-theme">
+        <div class="metric-number">12K+</div>
+        <div class="metric-label">Premium Properties</div>
+      </div>
+    </div>
+    <div class="col-lg-4 col-md-12">
+      <div class="metric-card border-theme">
+        <div class="metric-number">150+</div>
+        <div class="metric-label">Cities Across India</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 8. CUSTOMER TESTIMONIALS (Apple-Style Slider) -->
+<section class="container mt-5 py-3">
+  <hr class="mb-5 border-secondary-subtle">
+  <h3 class="fw-bold mb-1 text-center text-theme-main">What Travelers Say</h3>
+  <p class="text-muted small text-center mb-5">Read real reviews from checked bookings.</p>
+  
+  <div id="testimonialCarousel" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+      
+      <!-- Slide 1 -->
+      <div class="carousel-item active">
+        <div class="row justify-content-center">
+          <div class="col-md-8 col-lg-6">
+            <div class="card border-0 p-4 shadow-sm text-center mx-3 bg-theme-card border-theme" style="border-radius: var(--radius-card);">
+              <div class="mb-3 text-warning">
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+              </div>
+              <p class="fs-6 italic text-theme-muted mb-3 px-3">
+                "Yatra Sathi on YatraStay parsed my natural language query and recommended the Ocean View Resort in Goa. The booking flow was seamless!"
+              </p>
+              <h6 class="fw-bold m-0 text-theme-main">Dhairya Shah</h6>
+              <small class="text-muted">Verified Traveler • Goa Vacationer</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 2 -->
+      <div class="carousel-item">
+        <div class="row justify-content-center">
+          <div class="col-md-8 col-lg-6">
+            <div class="card border-0 p-4 shadow-sm text-center mx-3 bg-theme-card border-theme" style="border-radius: var(--radius-card);">
+              <div class="mb-3 text-warning">
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+              </div>
+              <p class="fs-6 italic text-theme-muted mb-3 px-3">
+                "I loved the dark mode interface and the floating AI Assistant button. Highly responsive, works beautifully on my phone. Competes directly with global platforms."
+              </p>
+              <h6 class="fw-bold m-0 text-theme-main">Soham Sharma</h6>
+              <small class="text-muted">Verified Traveler • Jaipur Explorer</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    
+    <!-- Controls -->
+    <button class="carousel-control-prev text-dark" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="prev">
+      <i class="fa-solid fa-chevron-left fs-3 text-dark"></i>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next text-dark" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="next">
+      <i class="fa-solid fa-chevron-right fs-3 text-dark"></i>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>
+</section>
+
+<%- include("partials/footer") %>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

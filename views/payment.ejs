@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout & Payment - YatraStay</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="/css/theme.css">
+  
+  <style>
+    /* Checkout & Stripe-Style Styling */
+    .checkout-container {
+      background: var(--color-white);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .checkout-form-section {
+      padding: 40px;
+    }
+    
+    .checkout-summary-section {
+      background: #f8fafc;
+      border-left: 1px solid var(--color-border);
+      padding: 40px;
+    }
+    
+    [data-theme="dark"] .checkout-summary-section {
+      background: rgba(15, 23, 42, 0.2);
+    }
+
+    .form-control-checkout {
+      background: var(--color-bg-base);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-input);
+      padding: 12px 16px;
+      font-size: 0.95rem;
+      color: var(--color-text-main);
+      width: 100%;
+      outline: none;
+      transition: all var(--speed-fast) var(--easing-premium);
+    }
+
+    .form-control-checkout:focus {
+      border-color: var(--color-accent-gold);
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+      background: var(--color-white);
+    }
+    
+    /* Order Summary Meta Row */
+    .receipt-row {
+      display: flex;
+      justify-content: space-between;
+      color: var(--color-text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 10px;
+    }
+    
+    .receipt-total {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 700;
+      color: var(--color-text-main);
+      font-size: 1.15rem;
+      border-top: 1px solid var(--color-border);
+      padding-top: 14px;
+      margin-top: 14px;
+    }
+    
+    .property-summary-box {
+      background: var(--color-white);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    /* Mobile responsive tweaks */
+    @media (max-width: 991px) {
+      .checkout-summary-section {
+        border-left: none;
+        border-top: 1px solid var(--color-border);
+        padding: 30px 20px;
+      }
+      .checkout-form-section {
+        padding: 30px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<%- include("partials/navbar") %>
+
+<div class="container py-5" style="min-height: 80vh;">
+  
+  <div class="checkout-container">
+    <div class="row g-0">
+      
+      <!-- Left Column: Checkout Payment Form details -->
+      <div class="col-lg-7 col-12 checkout-form-section">
+        
+        <div class="d-flex align-items-center gap-2 mb-4">
+          <i class="fa-solid fa-shield-halved text-warning fs-3"></i>
+          <div>
+            <h3 class="fw-bold mb-0 text-dark" style="font-family: 'Outfit', sans-serif;">Secure Check-out</h3>
+            <p class="text-muted small mb-0">Payments are encrypted and processed securely by YatraStay</p>
+          </div>
+        </div>
+
+        <form id="paymentForm" method="POST" action="/payment/success/<%= booking._id %>">
+          
+          <!-- Cardholder name -->
+          <div class="mb-3">
+            <label class="form-label small fw-bold text-dark" for="cardName">Cardholder Name</label>
+            <input type="text" id="cardName" class="form-control-checkout" placeholder="e.g. John Doe" required autocomplete="name">
+          </div>
+
+          <!-- Card number details -->
+          <div class="mb-3">
+            <label class="form-label small fw-bold text-dark" for="cardNumber">Card Number</label>
+            <div class="position-relative">
+              <input type="text" id="cardNumber" class="form-control-checkout ps-5" placeholder="0000 0000 0000 0000" maxlength="19" required>
+              <i class="fa-solid fa-credit-card position-absolute text-muted fs-5" style="top: 14px; left: 16px;"></i>
+            </div>
+          </div>
+
+          <!-- Expiry & CVV inline row -->
+          <div class="row g-3 mb-4">
+            <div class="col-6">
+              <label class="form-label small fw-bold text-dark" for="cardExpiry">Expiration Date</label>
+              <input type="text" id="cardExpiry" class="form-control-checkout text-center" placeholder="MM/YY" maxlength="5" required>
+            </div>
+            <div class="col-6">
+              <label class="form-label small fw-bold text-dark" for="cardCvv">CVV Code</label>
+              <input type="password" id="cardCvv" class="form-control-checkout text-center" placeholder="000" maxlength="3" required>
+            </div>
+          </div>
+
+          <!-- Promo Code Accordion Block -->
+          <div class="accordion border-0 mb-4" id="promoAccordion" style="border-radius: 8px; overflow: hidden;">
+            <div class="accordion-item border border-secondary-subtle" style="border-radius: 8px;">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed py-2.5 small fw-bold bg-white text-dark shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePromo">
+                  <i class="fa-solid fa-tag text-muted me-2"></i> Have a Coupon Code?
+                </button>
+              </h2>
+              <div id="collapsePromo" class="accordion-collapse collapse" data-bs-parent="#promoAccordion">
+                <div class="accordion-body bg-white d-flex gap-2">
+                  <input type="text" id="promoInput" class="form-control-checkout py-1.5" placeholder="e.g. YATRA20">
+                  <button type="button" id="applyPromoBtn" class="btn btn-outline-dark btn-sm rounded px-3">Apply</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pay Submit Button with Mock animation togglers -->
+          <button type="submit" id="payButton" class="btn btn-warning w-100 fw-bold text-dark py-3 rounded-pill shadow-sm d-flex align-items-center justify-content-center gap-2" style="font-size:1.05rem; transition: transform 0.2s ease;">
+            <i class="fa-solid fa-lock text-dark"></i>
+            <span id="payBtnText">Pay & Confirm Booking</span>
+          </button>
+
+          <!-- Mock security badges -->
+          <div class="text-center mt-3 text-muted" style="font-size:0.75rem;">
+            <i class="fa-solid fa-lock text-success me-1"></i> SSL Secured 256-bit Connection &nbsp;•&nbsp; PCI-DSS Compliant Gateway
+          </div>
+
+        </form>
+
+      </div>
+
+      <!-- Right Column: Order Booking Summary details -->
+      <div class="col-lg-5 col-12 checkout-summary-section d-flex flex-column justify-content-between">
+        
+        <%
+        // Calculate billing nights and aggregate price details dynamically
+        const checkin = new Date(booking.checkin);
+        const checkout = new Date(booking.checkout);
+        const diffTime = Math.abs(checkout - checkin);
+        const nights = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        const baseCost = booking.hotelId.price * nights;
+        const cleaningFee = 450;
+        const serviceFee = 750;
+        const totalCost = baseCost + cleaningFee + serviceFee;
+
+        const options = { month: 'short', day: 'numeric', year: 'numeric' };
+        const checkinFormatted = checkin.toLocaleDateString("en-IN", options);
+        const checkoutFormatted = checkout.toLocaleDateString("en-IN", options);
+        %>
+
+        <div>
+          <h4 class="fw-bold mb-4 text-dark" style="font-family: 'Outfit', sans-serif;">Booking Summary</h4>
+          
+          <!-- Property details widget -->
+          <div class="property-summary-box d-flex gap-3 mb-4">
+            <img src="<%= booking.hotelId.image %>" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80';" class="rounded object-fit-cover" style="width: 100px; height: 75px;" alt="<%= booking.hotelId.name %>">
+            <div class="d-flex flex-column justify-content-center">
+              <h6 class="fw-bold text-dark mb-1 text-truncate" style="max-width: 180px;"><%= booking.hotelId.name %></h6>
+              <p class="text-muted small mb-1"><i class="fa-solid fa-location-dot text-danger"></i> <%= booking.hotelId.location %></p>
+              <small class="fw-semibold text-dark"><i class="fa-solid fa-star text-warning"></i> 4.8 Guest Rating</small>
+            </div>
+          </div>
+
+          <!-- Trip details meta -->
+          <div class="mb-4">
+            <span class="d-block fw-bold text-dark mb-2.5" style="font-size:0.85rem; text-transform: uppercase; letter-spacing:0.5px;">Trip Details</span>
+            <div class="row text-start g-2">
+              <div class="col-6">
+                <small class="text-muted d-block" style="font-size:0.75rem;">Check-in Date</small>
+                <strong class="text-dark small"><%= checkinFormatted %></strong>
+              </div>
+              <div class="col-6">
+                <small class="text-muted d-block" style="font-size:0.75rem;">Check-out Date</small>
+                <strong class="text-dark small"><%= checkoutFormatted %></strong>
+              </div>
+              <div class="col-12 mt-2">
+                <small class="text-muted d-block" style="font-size:0.75rem;">Total Duration</small>
+                <strong class="text-dark small"><%= nights %> <%= nights === 1 ? 'Night' : 'Nights' %></strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Receipt breakdown details -->
+        <div class="border-top pt-4">
+          <span class="d-block fw-bold text-dark mb-3" style="font-size:0.85rem; text-transform: uppercase; letter-spacing:0.5px;">Price Breakdown</span>
+          
+          <div class="receipt-row">
+            <span>₹<%= booking.hotelId.price.toLocaleString("en-IN") %> x <%= nights %> <%= nights === 1 ? 'night' : 'nights' %></span>
+            <span>₹ <%= baseCost.toLocaleString("en-IN") %></span>
+          </div>
+          
+          <div class="receipt-row">
+            <span>Cleaning Fee</span>
+            <span>₹ <%= cleaningFee %></span>
+          </div>
+          
+          <div class="receipt-row">
+            <span>Yatra Service Fee</span>
+            <span>₹ <%= serviceFee %></span>
+          </div>
+
+          <div class="receipt-total" id="receiptTotalContainer" data-base="<%= totalCost %>">
+            <span>Total Payable (INR)</span>
+            <span>₹ <%= totalCost.toLocaleString("en-IN") %></span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<%- include("partials/footer") %>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const paymentForm = document.getElementById("paymentForm");
+    const payBtn = document.getElementById("payButton");
+    const payBtnText = document.getElementById("payBtnText");
+
+    const cardNumber = document.getElementById("cardNumber");
+    const cardExpiry = document.getElementById("cardExpiry");
+    const cardCvv = document.getElementById("cardCvv");
+
+    // 1. Credit Card Form Format Cues
+    cardNumber.addEventListener("input", (e) => {
+      let value = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+      let matches = value.match(/\d{4,16}/g);
+      let match = matches && matches[0] || '';
+      let parts = [];
+
+      for (let i = 0, len = match.length; i < len; i += 4) {
+        parts.push(match.substring(i, i + 4));
+      }
+
+      if (parts.length > 0) {
+        e.target.value = parts.join(' ');
+      } else {
+        e.target.value = value;
+      }
+    });
+
+    cardExpiry.addEventListener("input", (e) => {
+      let value = e.target.value.replace(/\//g, '').replace(/[^0-9]/gi, '');
+      if (value.length >= 2) {
+        e.target.value = value.substring(0, 2) + '/' + value.substring(2, 4);
+      } else {
+        e.target.value = value;
+      }
+    });
+
+    cardCvv.addEventListener("input", (e) => {
+      e.target.value = e.target.value.replace(/[^0-9]/gi, '');
+    });
+
+    // 2. Coupon Codes dynamic updates
+    const applyPromoBtn = document.getElementById("applyPromoBtn");
+    const promoInput = document.getElementById("promoInput");
+    const totalContainer = document.getElementById("receiptTotalContainer");
+    let promoApplied = false;
+
+    if (applyPromoBtn) {
+      applyPromoBtn.addEventListener("click", () => {
+        if (promoApplied) return;
+        const code = promoInput.value.trim().toUpperCase();
+        if (code === "YATRA20") {
+          const originalTotal = parseInt(totalContainer.getAttribute("data-base"));
+          const discountedTotal = Math.round(originalTotal * 0.8); // 20% Off
+
+          totalContainer.innerHTML = `
+            <div>
+              <span>Total Payable (INR)</span>
+              <small class="text-success d-block fw-bold" style="font-size:0.75rem;">Coupon YATRA20 Applied (-20%)</small>
+            </div>
+            <span class="text-success">₹ ${discountedTotal.toLocaleString("en-IN")}</span>
+          `;
+          promoApplied = true;
+          applyPromoBtn.disabled = true;
+          promoInput.disabled = true;
+        } else {
+          alert("Invalid coupon code. Try using 'YATRA20' for a 20% discount!");
+        }
+      });
+    }
+
+    // 3. SECURING TRANSACTION LOADER ON SUBMIT
+    paymentForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      // Deactivate form to prevent multiple hits
+      payBtn.disabled = true;
+      payBtn.style.transform = "scale(0.98)";
+      payBtnText.innerHTML = `<span class="spinner-border spinner-border-sm text-dark me-2" role="status"></span> Securing your transaction...`;
+
+      // Simulating a secure backend handshaking profile latency before success redirect
+      setTimeout(() => {
+        paymentForm.submit();
+      }, 1800);
+    });
+  });
+</script>
+</body>
+</html>

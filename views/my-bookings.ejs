@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Dashboard & Bookings - YatraStay</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="/css/theme.css">
+  
+  <style>
+    /* Dashboard Stats Widget */
+    .stat-box {
+      background: var(--color-white);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      text-align: center;
+      transition: all var(--speed-fast) var(--easing-premium);
+    }
+    
+    .stat-box:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      border-color: rgba(245, 158, 11, 0.2);
+    }
+    
+    .stat-num {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    
+    .stat-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--color-text-muted);
+      letter-spacing: 0.5px;
+    }
+
+    /* Horizontal Booking Cards */
+    .booking-horizontal-card {
+      background: var(--color-white);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: all var(--speed-normal) var(--easing-premium);
+    }
+    
+    .booking-horizontal-card:hover {
+      box-shadow: var(--shadow-md);
+      border-color: rgba(245, 158, 11, 0.15);
+    }
+    
+    .booking-img-left {
+      width: 240px;
+      height: 190px;
+      object-fit: cover;
+    }
+    
+    .text-warning-dark {
+      color: #b45309 !important;
+    }
+    
+    /* Interactive Dashboard Tabs */
+    .dashboard-tabs {
+      display: flex;
+      gap: 16px;
+      border-bottom: 1px solid var(--color-border);
+      padding-bottom: 12px;
+      margin-bottom: 30px;
+    }
+    
+    .dash-tab-btn {
+      background: transparent;
+      border: none;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      position: relative;
+      padding-bottom: 8px;
+      transition: color var(--speed-fast) var(--easing-premium);
+    }
+    
+    .dash-tab-btn:hover {
+      color: var(--color-text-main);
+    }
+    
+    .dash-tab-btn.active {
+      color: var(--color-accent-gold);
+    }
+    
+    .dash-tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -13px;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: var(--color-accent-gold);
+      border-radius: var(--radius-pill);
+    }
+
+    /* Responsive Mobile Tweaks */
+    @media (max-width: 768px) {
+      .booking-horizontal-card {
+        flex-direction: column;
+      }
+      .booking-img-left {
+        width: 100%;
+        height: 160px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<%- include("partials/navbar") %>
+
+<div class="container py-5 container-mobile-padding" style="min-height: 80vh;">
+  
+  <!-- Dashboard Page Header -->
+  <div class="px-3 px-sm-0 mb-4">
+    <h2 class="fw-bold mb-1 text-dark" style="font-family: 'Outfit', sans-serif; letter-spacing: -0.02em;">Account Dashboard</h2>
+    <p class="text-muted small mb-0">Manage your reservations, view mock invoice receipts, and check saved properties.</p>
+  </div>
+
+  <%
+    // dynamic calculations of stays
+    const today = new Date();
+    const upcomingBookings = bookings.filter(b => new Date(b.checkin) >= today);
+    const pastBookings = bookings.filter(b => new Date(b.checkin) < today);
+  %>
+
+  <!-- Dashboard Metrics Row -->
+  <div class="row g-3 px-3 px-sm-0 mb-5">
+    <div class="col-md-4 col-sm-6 col-12">
+      <div class="stat-box shadow-sm">
+        <div class="stat-num"><%= bookings.length %></div>
+        <div class="stat-label"><i class="fa-solid fa- suitcase me-1 text-warning"></i> Total Bookings</div>
+      </div>
+    </div>
+    <div class="col-md-4 col-sm-6 col-12">
+      <div class="stat-box shadow-sm">
+        <div class="stat-num"><%= upcomingBookings.length %></div>
+        <div class="stat-label"><i class="fa-solid fa-calendar-days me-1 text-success"></i> Upcoming Stays</div>
+      </div>
+    </div>
+    <div class="col-md-4 col-sm-12 col-12">
+      <div class="stat-box shadow-sm">
+        <div class="stat-num" id="dashboardWishlistCount">0</div>
+        <div class="stat-label"><i class="fa-solid fa-heart me-1 text-danger"></i> Saved Wishlist</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Timeline Tab Filters -->
+  <div class="px-3 px-sm-0">
+    <div class="dashboard-tabs">
+      <button class="dash-tab-btn active" id="btnUpcoming">Upcoming Stays (<%= upcomingBookings.length %>)</button>
+      <button class="dash-tab-btn" id="btnPast">Past Bookings (<%= pastBookings.length %>)</button>
+    </div>
+  </div>
+
+  <!-- Listings Sections Containers -->
+  <div class="px-3 px-sm-0">
+    
+    <!-- 1. UPCOMING TRIPS CONTAINER -->
+    <div id="sectionUpcoming">
+      <% if (upcomingBookings.length === 0) { %>
+        <div class="stat-box text-center py-5 my-3">
+          <i class="fa-solid fa-suitcase-rolling fa-3x mb-3 text-secondary opacity-50"></i>
+          <h5 class="fw-bold">No upcoming trips booked</h5>
+          <p class="text-muted small max-width-500 mx-auto mb-4">You have no upcoming reservation schedules checked. Explore stays and check out luxury rentals today!</p>
+          <a href="/hotels/search" class="btn btn-warning fw-bold text-dark px-4 py-2 rounded-pill shadow-sm" style="font-size:0.85rem;">
+            Explore Stays
+          </a>
+        </div>
+      <% } else { %>
+        <% upcomingBookings.forEach(b => { %>
+          <%- renderBookingCard(b) %>
+        <% }) %>
+      <% } %>
+    </div>
+
+    <!-- 2. PAST TRIPS CONTAINER (Hidden by default) -->
+    <div id="sectionPast" class="d-none">
+      <% if (pastBookings.length === 0) { %>
+        <div class="stat-box text-center py-5 my-3">
+          <i class="fa-solid fa-clock-rotate-left fa-3x mb-3 text-secondary opacity-50"></i>
+          <h5 class="fw-bold">No past trips recorded</h5>
+          <p class="text-muted small mb-0">Your completed stay histories will display here once you checkout.</p>
+        </div>
+      <% } else { %>
+        <% pastBookings.forEach(b => { %>
+          <%- renderBookingCard(b) %>
+        <% }) %>
+      <% } %>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Helper Dynamic EJS Function to render standard cards -->
+<%
+function renderBookingCard(b) {
+  const checkinDate = new Date(b.checkin);
+  const checkoutDate = new Date(b.checkout);
+  const diffNights = Math.ceil(Math.abs(checkoutDate - checkinDate) / (1000 * 60 * 60 * 24));
+  const totalCost = (b.hotelId.price * diffNights) + 450 + 750;
+
+  const dateOpts = { month: 'short', day: 'numeric', year: 'numeric' };
+  const checkinFmt = checkinDate.toLocaleDateString("en-IN", dateOpts);
+  const checkoutFmt = checkoutDate.toLocaleDateString("en-IN", dateOpts);
+%>
+  <div class="booking-horizontal-card d-flex flex-column flex-md-row mb-4 shadow-sm">
+    <img src="<%= b.hotelId.image %>" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80';" class="booking-img-left" alt="<%= b.hotelId.name %>">
+    
+    <div class="booking-card-body p-4 flex-grow-1 d-flex flex-column justify-content-between">
+      <div>
+        <div class="d-flex justify-content-between align-items-start mb-2.5 flex-wrap gap-2">
+          <div>
+            <h5 class="fw-bold text-dark mb-1" style="font-family:'Outfit', sans-serif;"><%= b.hotelId.name %></h5>
+            <p class="text-muted small mb-0"><i class="fa-solid fa-location-dot text-danger"></i> <%= b.hotelId.location %></p>
+          </div>
+          <div>
+            <% if (b.paymentStatus === 'paid') { %>
+              <span class="badge bg-success-subtle text-success border border-success-subtle px-2.5 py-1.5 rounded fw-bold text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.5px;">
+                <i class="fa-solid fa-circle-check me-1"></i> Paid & Confirmed
+              </span>
+            <% } else { %>
+              <span class="badge bg-warning-subtle text-warning-dark border border-warning-subtle px-2.5 py-1.5 rounded fw-bold text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.5px;">
+                <i class="fa-solid fa-clock me-1"></i> Payment Pending
+              </span>
+            <% } %>
+          </div>
+        </div>
+
+        <div class="row g-2 my-3">
+          <div class="col-6 col-sm-3">
+            <small class="text-muted d-block" style="font-size:0.75rem;">Check-in</small>
+            <strong class="text-dark small"><%= checkinFmt %></strong>
+          </div>
+          <div class="col-6 col-sm-3">
+            <small class="text-muted d-block" style="font-size:0.75rem;">Check-out</small>
+            <strong class="text-dark small"><%= checkoutFmt %></strong>
+          </div>
+          <div class="col-6 col-sm-3">
+            <small class="text-muted d-block" style="font-size:0.75rem;">Duration</small>
+            <strong class="text-dark small"><%= diffNights %> <%= diffNights === 1 ? 'Night' : 'Nights' %></strong>
+          </div>
+          <div class="col-6 col-sm-3">
+            <small class="text-muted d-block" style="font-size:0.75rem;">Base Rate</small>
+            <strong class="text-dark small">₹ <%= b.hotelId.price.toLocaleString("en-IN") %> / night</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex align-items-center justify-content-between pt-3 border-top mt-auto flex-wrap gap-2">
+        <span class="card-price fw-bold text-dark fs-6">
+          Total Paid: ₹<%= totalCost.toLocaleString("en-IN") %>
+        </span>
+        
+        <div class="d-flex gap-2">
+          <a href="/hotels/<%= b.hotelId._id %>" class="btn btn-sm btn-outline-dark rounded-pill px-3">
+            View Property
+          </a>
+          <% if (b.paymentStatus !== 'paid') { %>
+            <a href="/payment/<%= b._id %>" class="btn btn-sm btn-warning text-dark fw-bold rounded-pill px-3 shadow-sm">
+              Pay Now
+            </a>
+          <% } else { %>
+            <button class="btn btn-sm btn-light border rounded-pill px-3" onclick="alert('Mock receipt download triggered! Status: Confirmed invoice.')">
+              <i class="fa-solid fa-file-invoice me-1"></i> Receipt
+            </button>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% } %>
+
+<%- include("partials/footer") %>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // 1. Sync wishlist counts from localStorage
+    const wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+    const countEl = document.getElementById("dashboardWishlistCount");
+    if (countEl) {
+      countEl.textContent = wishlist.length;
+    }
+
+    // 2. Tab switcher client-side handlers
+    const btnUpcoming = document.getElementById("btnUpcoming");
+    const btnPast = document.getElementById("btnPast");
+    const sectionUpcoming = document.getElementById("sectionUpcoming");
+    const sectionPast = document.getElementById("sectionPast");
+
+    btnUpcoming.addEventListener("click", () => {
+      btnUpcoming.classList.add("active");
+      btnPast.classList.remove("active");
+      sectionUpcoming.classList.remove("d-none");
+      sectionPast.classList.add("d-none");
+    });
+
+    btnPast.addEventListener("click", () => {
+      btnPast.classList.add("active");
+      btnUpcoming.classList.remove("active");
+      sectionPast.classList.remove("d-none");
+      sectionUpcoming.classList.add("d-none");
+    });
+  });
+</script>
+</body>
+</html>

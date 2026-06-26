@@ -1,0 +1,91 @@
+<!-- Premium Multi-Column Footer with Newsletter -->
+<footer class="premium-footer py-5 mt-5">
+  <div class="container">
+    <div class="row g-4 mb-5">
+      
+      <!-- Column 1: Brand Info -->
+      <div class="col-lg-3 col-md-6">
+        <h5 class="text-white fw-bold mb-3 d-flex align-items-center gap-2">
+          <i class="fa-solid fa-paper-plane text-warning"></i> YatraStay
+        </h5>
+        <p class="small text-white-50">
+          Your AI-powered luxury lodging companion. Discover unique stays, customized itineraries, and secure bookings across India.
+        </p>
+        <div class="d-flex gap-3 fs-5 mt-3">
+          <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
+          <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#" aria-label="Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+          <a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
+        </div>
+      </div>
+      
+      <!-- Column 2: Discover Stays -->
+      <div class="col-lg-2 col-md-6 col-6">
+        <h6>Discover Stays</h6>
+        <ul class="list-unstyled d-flex flex-column gap-2 small">
+          <li><a href="/hotels/search?location=Goa">Beachfront Stays in Goa</a></li>
+          <li><a href="/hotels/search?location=Manali">Mountain Cabins in Manali</a></li>
+          <li><a href="/hotels/search?location=Jaipur">Royal Stays in Jaipur</a></li>
+          <li><a href="/hotels/search?location=Mumbai">Business Hotels in Mumbai</a></li>
+        </ul>
+      </div>
+
+      <!-- Column 3: AI Assistant Links -->
+      <div class="col-lg-2 col-md-6 col-6">
+        <h6>AI Support</h6>
+        <ul class="list-unstyled d-flex flex-column gap-2 small">
+          <li><a href="/ai-assistant">Chat AI Assistant</a></li>
+          <li><a href="/ai-assistant?q=Find+a+budget+stay">Goa Budget Helper</a></li>
+          <li><a href="/ai-assistant?q=Luxury+villas">Jaipur Heritage Planner</a></li>
+          <li><a href="/ai-assistant?q=Mountain+retreats">Manali Cabin Finder</a></li>
+        </ul>
+      </div>
+
+      <!-- Column 4: Newsletter Subscription -->
+      <div class="col-lg-5 col-md-6">
+        <h6>Subscribe to Newsletter</h6>
+        <p class="small text-white-50 mb-3">
+          Get exclusive travel recommendations and weekly secret discounts directly in your inbox.
+        </p>
+        <form class="d-flex gap-2" onsubmit="event.preventDefault(); alert('Thank you for subscribing!');">
+          <input 
+            type="email" 
+            class="form-control bg-transparent text-white border-secondary shadow-none px-3" 
+            placeholder="Enter your email" 
+            required
+          >
+          <button type="submit" class="btn btn-warning fw-bold text-dark px-4">
+            Subscribe
+          </button>
+        </form>
+      </div>
+
+    </div>
+
+    <!-- Bottom Line -->
+    <div class="border-top border-secondary-subtle pt-4 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+      <p class="small mb-0 text-white-50">
+        © 2026 YatraStay. Designed for recruiters and travel enthusiasts. All rights reserved.
+      </p>
+      <div class="d-flex gap-4 small text-white-50">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Map Sitemap</a>
+      </div>
+    </div>
+
+  </div>
+</footer>
+
+<!-- Site-wide Floating AI Concierge Trigger Bubble -->
+<button 
+  onclick="window.location.href='/ai-assistant';" 
+  class="floating-ai-btn" 
+  title="Ask Yatra Sathi"
+  aria-label="Open Yatra Sathi"
+>
+  <i class="fa-solid fa-wand-magic-sparkles"></i>
+</button>
+
+<!-- Site-wide scripts loader -->
+<script src="/js/theme.js"></script>

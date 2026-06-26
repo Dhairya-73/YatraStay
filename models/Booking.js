@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const reviewSchema = new mongoose.Schema({
+const bookingSchema = new mongoose.Schema({
   hotelId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Hotel"
@@ -9,12 +9,16 @@ const reviewSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User"
   },
-  rating: Number,
-  comment: String,
+  checkin: Date,
+  checkout: Date,
+  paymentStatus: {
+    type: String,
+    default: "pending"
+  },
   createdAt: {
     type: Date,
     default: Date.now
   }
 });
 
-module.exports = mongoose.model("Review", reviewSchema);
+module.exports = mongoose.model("Booking", bookingSchema);

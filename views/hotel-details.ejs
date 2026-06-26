@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= hotel.name %> - YatraStay Details</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="/css/theme.css">
+  
+  <style>
+    /* Luxury Immersive Image Gallery Grid */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 12px;
+      margin-bottom: 30px;
+      border-radius: var(--radius-card);
+      overflow: hidden;
+    }
+    
+    .gallery-main {
+      height: 420px;
+      position: relative;
+    }
+    
+    .gallery-side {
+      display: grid;
+      grid-template-rows: 1fr 1fr;
+      gap: 12px;
+      height: 420px;
+    }
+    
+    .gallery-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: all var(--speed-normal) var(--easing-premium);
+      cursor: pointer;
+    }
+    
+    .gallery-img:hover {
+      filter: brightness(0.92);
+      transform: scale(1.01);
+    }
+    
+    /* Sticky Sidebar Widget */
+    .sticky-sidebar {
+      position: sticky;
+      top: 100px;
+      z-index: 10;
+    }
+    
+    .booking-card {
+      background: var(--color-white);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      padding: 24px;
+      box-shadow: var(--shadow-md);
+      transition: box-shadow var(--speed-normal) var(--easing-premium);
+    }
+    
+    .booking-card:hover {
+      box-shadow: var(--shadow-lg);
+    }
+    
+    /* Bill details breakdown styling */
+    .bill-row {
+      display: flex;
+      justify-content: space-between;
+      color: var(--color-text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+    }
+    
+    .bill-total {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 700;
+      color: var(--color-text-main);
+      font-size: 1.1rem;
+      border-top: 1px solid var(--color-border);
+      padding-top: 12px;
+      margin-top: 12px;
+    }
+
+    /* AI Recommendation Insights Block */
+    .detail-ai-box {
+      background: rgba(245, 158, 11, 0.04);
+      border: 1px solid rgba(245, 158, 11, 0.16) !important;
+      border-radius: var(--radius-card);
+      padding: 20px;
+    }
+    
+    .detail-ai-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #FEF3C7;
+      color: #D97706;
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      border-radius: var(--radius-pill);
+      padding: 4px 12px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .card-badge-custom {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--color-primary-dark);
+      color: var(--color-white);
+      border-radius: var(--radius-pill);
+      padding: 6px 14px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      border: 1px solid var(--color-border);
+    }
+
+    /* Custom color styling per AI recommendation type */
+    .badge-beach { background: #e0f2fe; color: #0369a1; border-color: rgba(3, 105, 161, 0.2); }
+    .badge-work { background: #f1f5f9; color: #0f172a; border-color: rgba(15, 23, 42, 0.2); }
+    .badge-couple { background: #ffe4e6; color: #be185d; border-color: rgba(190, 24, 74, 0.2); }
+    .badge-family { background: #f0fdf4; color: #15803d; border-color: rgba(21, 128, 61, 0.2); }
+    .badge-value { background: #ecfdf5; color: #047857; border-color: rgba(4, 120, 87, 0.2); }
+    .badge-match { background: #fffbeb; color: #b45309; border-color: rgba(180, 83, 9, 0.2); }
+
+    .pro-con-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .pro-con-list li {
+      font-size: 0.88rem;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    /* Host Card Layout */
+    .host-card {
+      background: var(--color-white);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .host-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--color-primary-dark);
+      color: var(--color-white);
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--color-accent-gold);
+    }
+    
+    /* Verified Amenities List Grid */
+    .amenities-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    
+    .amenity-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.9rem;
+      color: var(--color-text-main);
+      padding: 8px;
+      border-radius: 8px;
+      background: var(--color-white);
+      border: 1px solid var(--color-border);
+    }
+    
+    .amenity-item i {
+      color: var(--color-accent-gold);
+      font-size: 1rem;
+    }
+
+    /* Review Card Testimonial Layout */
+    .review-item-card {
+      background: var(--color-white);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      padding: 16px 20px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 16px;
+    }
+    
+    .review-avatar-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #e2e8f0;
+      color: var(--color-primary-dark);
+      font-weight: 600;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Mobile Responsive Layout overrides */
+    @media (max-width: 768px) {
+      .gallery-grid {
+        grid-template-columns: 1fr;
+        border-radius: 0;
+      }
+      .gallery-side {
+        display: none;
+      }
+      .gallery-main {
+        height: 280px;
+      }
+      .container-mobile-padding {
+        padding-left: 0;
+        padding-right: 0;
+      }
+      .mobile-card-bleed {
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Marker element to trigger local recently viewed logging -->
+<div id="hotelDetailMarker" 
+     data-hotel-id="<%= hotel._id %>" 
+     data-hotel-name="<%= hotel.name %>" 
+     data-hotel-location="<%= hotel.location %>" 
+     data-hotel-price="<%= hotel.price %>" 
+     data-hotel-image="<%= hotel.image %>" 
+     class="d-none"></div>
+
+<%- include("partials/navbar") %>
+
+<div class="container py-4 container-mobile-padding">
+  
+  <!-- Breadcrumbs & Navigation Back Link -->
+  <div class="px-3 px-sm-0 mb-3 d-flex justify-content-between align-items-center">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="/" class="text-muted text-decoration-none">Home</a></li>
+        <li class="breadcrumb-item"><a href="/hotels/search" class="text-muted text-decoration-none">Stays</a></li>
+        <li class="breadcrumb-item active text-dark fw-bold" aria-current="page"><%= hotel.name %></li>
+      </ol>
+    </nav>
+    <a href="/hotels/search" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+      <i class="fa-solid fa-arrow-left me-1"></i> Back to Search
+    </a>
+  </div>
+
+  <!-- Apple-Style Luxury Image Gallery -->
+  <div class="gallery-grid">
+    <div class="gallery-main">
+      <img src="<%= hotel.image %>" alt="<%= hotel.name %>" class="gallery-img">
+    </div>
+    <div class="gallery-side">
+      <!-- Stacking high-quality travel aesthetics thumbnails -->
+      <img src="https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=800&q=80" alt="Interior view" class="gallery-img">
+      <img src="https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&w=800&q=80" alt="Balcony view" class="gallery-img">
+    </div>
+  </div>
+
+  <div class="row g-4 px-3 px-sm-0">
+    <!-- Left Column: Hotel Details Meta -->
+    <div class="col-lg-8 col-md-12">
+      
+      <!-- Hotel title headers -->
+      <div class="d-flex justify-content-between align-items-start mb-3">
+        <div>
+          <h1 class="fw-bold mb-1 text-dark" style="font-family: 'Outfit', sans-serif; letter-spacing: -0.02em;"><%= hotel.name %></h1>
+          <p class="text-muted mb-0 d-flex align-items-center gap-1.5 fs-6">
+            <i class="fa-solid fa-location-dot text-danger"></i> <%= hotel.location %>
+          </p>
+        </div>
+        <div class="text-end">
+          <span class="fs-4 fw-bold text-dark d-flex align-items-center gap-1">
+            <i class="fa-solid fa-star text-warning"></i> 4.8
+          </span>
+          <small class="text-muted"><%= reviews.length %> Verified reviews</small>
+        </div>
+      </div>
+
+      <hr class="my-4">
+
+      <!-- Dynamic AI Insight Recommendation Card -->
+      <div class="detail-ai-box mb-4 shadow-sm">
+        <%- include("partials/ai-badge", { hotel }) %>
+        <h5 class="fw-bold text-dark mb-2" style="font-family: 'Outfit', sans-serif;">
+          <i class="fa-solid fa-wand-magic-sparkles text-warning me-1.5 animate-pulse"></i> Why Yatra AI Recommends This
+        </h5>
+        <p class="text-muted mb-3" style="font-size: 0.92rem; line-height: 1.5;">
+          <%- include("partials/ai-badge", { hotel, showOnlyText: true }) %>
+        </p>
+
+        <!-- Dynamic Pros/Cons list computed dynamically from descriptions -->
+        <%
+        const descLower = (hotel.description || "").toLowerCase();
+        let pros = [];
+        if (descLower.includes("wifi") || descLower.includes("wi-fi") || descLower.includes("internet")) {
+          pros.push("Reliable high-speed WiFi suitable for zoom meetings.");
+        }
+        if (descLower.includes("pool") || descLower.includes("swimming")) {
+          pros.push("Access to private swimming pool for relaxation.");
+        }
+        if (descLower.includes("couple") || descLower.includes("romantic") || descLower.includes("peaceful")) {
+          pros.push("Quiet, peaceful environment perfect for couples and retreats.");
+        }
+        if (descLower.includes("beach") || descLower.includes("sea") || hotel.location.toLowerCase().includes("goa")) {
+          pros.push("Close proximity to local beachfronts and coastal attractions.");
+        }
+        if (pros.length === 0) {
+          pros.push("Verified cleanliness score and premium room spacing layout.");
+        }
+        %>
+        
+        <div class="row g-2 mt-2 pt-2 border-top">
+          <div class="col-md-6 col-12">
+            <span class="d-block fw-bold text-success mb-2" style="font-size: 0.8rem; text-transform: uppercase;">
+              <i class="fa-solid fa-circle-check me-1"></i> Key Highlights
+            </span>
+            <ul class="pro-con-list">
+              <% pros.forEach(pro => { %>
+                <li class="text-muted"><span class="text-success">✔</span> <%= pro %></li>
+              <% }) %>
+            </ul>
+          </div>
+          <div class="col-md-6 col-12 mt-3 mt-md-0">
+            <span class="d-block fw-bold text-danger mb-2" style="font-size: 0.8rem; text-transform: uppercase;">
+              <i class="fa-solid fa-triangle-exclamation me-1"></i> Worth Noting
+            </span>
+            <ul class="pro-con-list">
+              <li class="text-muted"><span class="text-danger">⚠</span> High demand stay: slots book out quickly on weekends.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Description Block -->
+      <div class="mb-4">
+        <h4 class="fw-bold mb-3" style="font-family: 'Outfit', sans-serif;">About this stay</h4>
+        <p class="text-muted" style="line-height: 1.6; font-size: 0.95rem;"><%= hotel.description %></p>
+      </div>
+
+      <hr class="my-4">
+
+      <!-- Verified Amenities Checklist Grid -->
+      <div class="mb-4">
+        <h4 class="fw-bold mb-3" style="font-family: 'Outfit', sans-serif;">What this place offers</h4>
+        <div class="amenities-grid">
+          <%
+          // Determine amenities presence dynamically
+          const amenities = [
+            { icon: "fa-wifi", label: "High-speed WiFi", key: "wifi" },
+            { icon: "fa-water", label: "Private Pool", key: "pool" },
+            { icon: "fa-snowflake", label: "Air Conditioning", key: "ac" },
+            { icon: "fa-square-parking", label: "Free Parking", key: "parking" },
+            { icon: "fa-utensils", label: "Kitchen Access", key: "kitchen" },
+            { icon: "fa-mug-hot", label: "Breakfast Included", key: "breakfast" },
+            { icon: "fa-paw", label: "Pet Friendly", key: "pet" },
+            { icon: "fa-briefcase", label: "Dedicated Workspace", key: "workspace" }
+          ];
+
+          amenities.forEach(am => {
+            const hasAmenity = descLower.includes(am.key) || descLower.includes(am.label.toLowerCase().split(' ')[0]);
+          %>
+            <div class="amenity-item <%= hasAmenity ? '' : 'opacity-50' %>">
+              <i class="fa-solid <%= am.icon %>"></i>
+              <span class="<%= hasAmenity ? 'text-dark fw-medium' : 'text-decoration-line-through text-muted' %>"><%= am.label %></span>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+
+      <hr class="my-4">
+
+      <!-- Host Profile Card -->
+      <div class="host-card mb-4">
+        <div class="host-avatar">
+          <%= hotel.location ? hotel.location.trim().charAt(0).toUpperCase() : 'Y' %>
+        </div>
+        <div>
+          <h5 class="fw-bold text-dark mb-1" style="font-family: 'Outfit', sans-serif;">
+            Hosted by Yatra Premier Host <i class="fa-solid fa-circle-check text-warning ms-1" title="Verified Host"></i>
+          </h5>
+          <p class="text-muted small mb-0">
+            Response Rate: <strong>100%</strong> &nbsp;•&nbsp; Response Time: <strong>within an hour</strong> &nbsp;•&nbsp; Hosted since <strong>2023</strong>
+          </p>
+        </div>
+      </div>
+
+      <hr class="my-4">
+
+      <!-- Reviews list Section -->
+      <div class="mb-4">
+        <h4 class="fw-bold mb-3 d-flex align-items-center gap-2" style="font-family: 'Outfit', sans-serif;">
+          <i class="fa-solid fa-comment-dots text-warning"></i> Guest Reviews (<%= reviews.length %>)
+        </h4>
+
+        <% if (reviews.length === 0) { %>
+          <div class="alert alert-light border p-4 text-center text-muted" style="border-radius: var(--radius-card);">
+            <i class="fa-solid fa-comments fa-2x mb-3 text-secondary opacity-50"></i>
+            <p class="mb-0">No reviews submitted for this property yet. Be the first to share your experience!</p>
+          </div>
+        <% } else { %>
+          <div class="row">
+            <% reviews.forEach(r => { 
+                const userInitials = r.userId && r.userId.name ? r.userId.name.charAt(0).toUpperCase() : 'G';
+                const userName = r.userId && r.userId.name ? r.userId.name : 'Verified Guest';
+            %>
+              <div class="col-md-6 col-12">
+                <div class="review-item-card">
+                  <div class="d-flex align-items-center gap-2.5 mb-2.5">
+                    <div class="review-avatar-circle">
+                      <%= userInitials %>
+                    </div>
+                    <div>
+                      <h6 class="fw-bold mb-0 text-dark" style="font-size:0.9rem;"><%= userName %></h6>
+                      <small class="text-warning-dark d-flex align-items-center gap-1" style="font-size: 0.8rem;">
+                        <% for (let i = 0; i < 5; i++) { %>
+                          <i class="<%= i < r.rating ? 'fa-solid' : 'fa-regular' %> fa-star text-warning"></i>
+                        <% } %>
+                        <strong class="text-dark ms-1"><%= r.rating %> ★</strong>
+                      </small>
+                    </div>
+                  </div>
+                  <p class="text-muted small mb-0" style="line-height:1.5;"><%= r.comment %></p>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        <% } %>
+
+        <!-- Submit Review Form (Only for logged in users) -->
+        <% if (user) { %>
+          <div class="card border-0 shadow-sm p-4 mt-4" style="border-radius: var(--radius-card); background: #f8fafc; border: 1px solid var(--color-border) !important;">
+            <h5 class="fw-bold mb-3 text-dark" style="font-family: 'Outfit', sans-serif;"><i class="fa-solid fa-pen-to-square me-1"></i> Write a Review</h5>
+            <form method="POST" action="/reviews/<%= hotel._id %>">
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label class="form-label small fw-bold text-dark">Rating Star Score</label>
+                  <select class="form-select border-0 shadow-none py-2" name="rating" required style="border-radius: 8px;">
+                    <option value="5">⭐⭐⭐⭐⭐ (5 Stars)</option>
+                    <option value="4">⭐⭐⭐⭐ (4 Stars)</option>
+                    <option value="3">⭐⭐⭐ (3 Stars)</option>
+                    <option value="2">⭐⭐ (2 Stars)</option>
+                    <option value="1">⭐ (1 Star)</option>
+                  </select>
+                </div>
+                <div class="col-12">
+                  <label class="form-label small fw-bold text-dark">Share your detailed experience</label>
+                  <textarea class="form-control border-0 shadow-none py-2" name="comment" rows="3" placeholder="Explain the host behavior, cleanliness, amenities, and scenery..." required style="border-radius: 8px; resize: none;"></textarea>
+                </div>
+                <div class="col-12 text-end">
+                  <button class="btn btn-warning fw-bold text-dark px-4 py-2 rounded-pill shadow-sm" style="font-size:0.85rem;">
+                    Submit Public Review
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        <% } else { %>
+          <div class="alert alert-light border text-center p-3 mt-3" style="border-radius: 8px; font-size: 0.85rem;">
+            <i class="fa-solid fa-lock text-muted me-1.5"></i> Want to submit a review? <a href="/login" class="fw-bold text-dark">Login to your account</a> to get writing access.
+          </div>
+        <% } %>
+      </div>
+
+    </div>
+
+    <!-- Right Column: Sticky Booking Widget -->
+    <div class="col-lg-4 col-md-12">
+      <div class="sticky-sidebar">
+        <div class="booking-card">
+          
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="fs-4 fw-extrabold text-dark" id="basePriceContainer">
+              ₹<%= hotel.price.toLocaleString("en-IN") %> <span class="fs-6 text-muted fw-normal">/ night</span>
+            </span>
+            <span class="small fw-semibold text-dark"><i class="fa-solid fa-star text-warning"></i> 4.8</span>
+          </div>
+
+          <!-- Date Input Booking Form -->
+          <form id="bookingForm" method="POST" action="/booking/<%= hotel._id %>">
+            
+            <div class="mb-3">
+              <label class="form-label small fw-bold text-dark"><i class="fa-solid fa-calendar-plus text-muted me-1"></i> Check-in Date</label>
+              <input class="form-control py-2 shadow-none border" type="date" id="checkinInput" name="checkin" required style="border-radius: var(--radius-input);">
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label small fw-bold text-dark"><i class="fa-solid fa-calendar-check text-muted me-1"></i> Check-out Date</label>
+              <input class="form-control py-2 shadow-none border" type="date" id="checkoutInput" name="checkout" required style="border-radius: var(--radius-input);">
+            </div>
+
+            <!-- Billing Breakdown Tray (Populated dynamically via JS) -->
+            <div id="bookingBreakdownTray" class="d-none mt-3 pt-3 border-top">
+              <div class="bill-row">
+                <span id="rateBreakdownLabel">₹<%= hotel.price %> x 0 nights</span>
+                <span id="rateBreakdownVal">₹ 0</span>
+              </div>
+              <div class="bill-row">
+                <span>Cleaning Fee</span>
+                <span>₹ 450</span>
+              </div>
+              <div class="bill-row">
+                <span>Yatra Service Fee</span>
+                <span>₹ 750</span>
+              </div>
+              <div class="bill-total">
+                <span>Total Cost</span>
+                <span id="rateBreakdownTotal">₹ 0</span>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-warning w-100 fw-bold text-dark py-2.5 rounded-pill shadow-sm mt-3" style="font-size: 0.95rem; transition: transform 0.2s ease;">
+              Confirm & Book Stay
+            </button>
+            
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom: Similar Properties Tray -->
+  <% if (locals.similarStays && similarStays.length > 0) { %>
+    <div class="mt-5 pt-5 border-top px-3 px-sm-0">
+      <h3 class="fw-bold mb-1 text-dark" style="font-family: 'Outfit', sans-serif;">Similar Stays You Might Like</h3>
+      <p class="text-muted small mb-4">Handpicked vacation rentals with equivalent accommodation styles and reviews.</p>
+      
+      <div class="row g-4">
+        <% similarStays.forEach(h => { %>
+          <div class="col-lg-4 col-md-6 col-sm-12">
+            <!-- Reuse our premium property card component! -->
+            <%- include("partials/property-card", { hotel: h }) %>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+  <% } %>
+
+</div>
+
+<%- include("partials/footer") %>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const checkinInput = document.getElementById("checkinInput");
+    const checkoutInput = document.getElementById("checkoutInput");
+    const breakdownTray = document.getElementById("bookingBreakdownTray");
+    const rateLabel = document.getElementById("rateBreakdownLabel");
+    const rateVal = document.getElementById("rateBreakdownVal");
+    const rateTotal = document.getElementById("rateBreakdownTotal");
+
+    const pricePerNight = <%= hotel.price %>;
+
+    // Set checkin minimum to today
+    const today = new Date().toISOString().split('T')[0];
+    checkinInput.min = today;
+
+    // Sync checkout minimum date
+    checkinInput.addEventListener("change", () => {
+      checkoutInput.min = checkinInput.value;
+      calculateBilling();
+    });
+
+    checkoutInput.addEventListener("change", () => {
+      calculateBilling();
+    });
+
+    function calculateBilling() {
+      const checkinDate = new Date(checkinInput.value);
+      const checkoutDate = new Date(checkoutInput.value);
+
+      if (checkinInput.value && checkoutInput.value && checkoutDate > checkinDate) {
+        // Calculate nights
+        const diffTime = Math.abs(checkoutDate - checkinDate);
+        const diffNights = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        const baseCost = pricePerNight * diffNights;
+        const cleaningFee = 450;
+        const serviceFee = 750;
+        const totalCost = baseCost + cleaningFee + serviceFee;
+
+        // Populate tray
+        rateLabel.textContent = `₹${pricePerNight.toLocaleString("en-IN")} x ${diffNights} ${diffNights === 1 ? 'night' : 'nights'}`;
+        rateVal.textContent = `₹ ${baseCost.toLocaleString("en-IN")}`;
+        rateTotal.textContent = `₹ ${totalCost.toLocaleString("en-IN")}`;
+
+        breakdownTray.classList.remove("d-none");
+      } else {
+        breakdownTray.classList.add("d-none");
+      }
+    }
+  });
+</script>
+</body>
+</html>

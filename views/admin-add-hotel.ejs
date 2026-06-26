@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add New Property - YatraStay Admin</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="/css/theme.css">
+  
+  <style>
+    .admin-bg {
+      min-height: 80vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-bg-base);
+    }
+    
+    .admin-card {
+      background: var(--color-white);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      padding: 40px;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .admin-input-group {
+      position: relative;
+      margin-bottom: 20px;
+    }
+    
+    .admin-input {
+      background: var(--color-bg-base);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-input);
+      padding: 12px 16px 12px 46px;
+      font-size: 0.95rem;
+      color: var(--color-text-main);
+      width: 100%;
+      outline: none;
+      transition: all var(--speed-fast) var(--easing-premium);
+    }
+    
+    .admin-input:focus {
+      border-color: var(--color-accent-gold);
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+      background: var(--color-white);
+    }
+    
+    .admin-input-icon {
+      position: absolute;
+      left: 16px;
+      top: 15px;
+      color: var(--color-text-muted);
+      font-size: 1.05rem;
+    }
+
+    textarea.admin-input {
+      padding-left: 16px;
+      resize: none;
+    }
+
+    .text-warning-dark {
+      color: #b45309 !important;
+    }
+  </style>
+</head>
+<body>
+
+<%- include("partials/navbar") %>
+
+<div class="admin-bg py-5 px-3">
+  <div class="admin-card">
+    
+    <div class="text-center mb-4">
+      <i class="fa-solid fa-hotel text-warning fs-1 mb-2"></i>
+      <h3 class="fw-bold text-dark mb-1" style="font-family: 'Outfit', sans-serif;">Add New Property</h3>
+      <p class="text-muted small">Publish a premium stay to YatraStay database listings</p>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" id="addHotelForm">
+      
+      <!-- Hotel Name Input -->
+      <div class="admin-input-group">
+        <i class="fa-solid fa-heading admin-input-icon"></i>
+        <input class="admin-input" name="name" placeholder="Hotel / Stay Name" required autocomplete="off">
+      </div>
+
+      <!-- Location Input -->
+      <div class="admin-input-group">
+        <i class="fa-solid fa-location-dot admin-input-icon"></i>
+        <input class="admin-input" name="location" placeholder="Location (e.g. Anjuna, Goa)" required autocomplete="off">
+      </div>
+
+      <!-- Price Input -->
+      <div class="admin-input-group">
+        <i class="fa-solid fa-indian-rupee-sign admin-input-icon"></i>
+        <input class="admin-input" type="number" name="price" placeholder="Price per night (INR)" required min="1">
+      </div>
+
+      <!-- Cover Image Input (URL or Upload) -->
+      <div class="admin-input-group">
+        <i class="fa-solid fa-link admin-input-icon"></i>
+        <input class="admin-input" name="imageUrl" placeholder="Option A: Paste Cover Image URL" autocomplete="off">
+      </div>
+
+      <div class="text-center mb-3">
+        <span class="badge bg-secondary-subtle text-muted px-2.5 py-1 fw-bold">OR</span>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label small fw-bold text-dark"><i class="fa-solid fa-cloud-arrow-up text-muted me-1"></i> Option B: Upload Image File</label>
+        <input class="form-control py-2 shadow-none border" type="file" name="image" id="imageFileInput" style="border-radius: var(--radius-input); background: var(--color-bg-base);">
+      </div>
+
+      <!-- Description Input -->
+      <div class="mb-4">
+        <label class="form-label small fw-bold text-dark"><i class="fa-solid fa-align-left text-muted me-1"></i> Property Description</label>
+        <textarea class="admin-input" name="description" rows="4" placeholder="Mention nearby attractions, amenities (wifi, pool, ac, parking), and space layouts..." required style="height: 100px; border-radius: var(--radius-input);"></textarea>
+      </div>
+
+      <!-- Submit button -->
+      <button class="btn btn-warning w-100 fw-bold text-dark py-2.5 rounded-pill shadow-sm" style="font-size: 0.95rem;">
+        Publish Listing
+      </button>
+      
+    </form>
+
+  </div>
+</div>
+
+<%- include("partials/footer") %>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.getElementById("addHotelForm").addEventListener("submit", (e) => {
+    const imageUrl = document.getElementsByName("imageUrl")[0].value.trim();
+    const fileInput = document.getElementById("imageFileInput");
+    
+    if (!imageUrl && (!fileInput.files || fileInput.files.length === 0)) {
+      e.preventDefault();
+      alert("Please either paste a Cover Image URL (Option A) or upload an Image File (Option B).");
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+<!-- Reusable Filter Chip -->
+<!-- File: views/partials/filter-chip.ejs -->
+
+<button class="filter-chip" data-filter="<%= filter %>" aria-pressed="false">
+  <% if (locals.icon) { %>
+    <i class="fa-solid <%= icon %>"></i>
+  <% } %>
+  <span><%= label %></span>
+</button>
