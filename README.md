@@ -30,3 +30,13 @@ YatraStay is a full-stack property rental web application similar to airbnb webs
 - Authorization for listings and reviews
 - Listing ownership and review ownership
 - Improved UI and flash messaging
+
+# Phase 3: Yatra Sathi AI & Premium UI Updates
+
+- Yatra Sathi AI Travel Companion powered by Gemini API
+- Fully integrated dark mode toggle with high-contrast stylesheets
+- Premium Airbnb-style segmented search pill on homepage hero
+- Realistic database seeding with 15+ stays across India
+- Multi-option hotel photo submission (local files + text URLs)
+- Fail-safe global image fallback handlers to prevent broken assets
+- Orphaned database reference checking to prevent dashboard crashes
